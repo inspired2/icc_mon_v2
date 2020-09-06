@@ -1,13 +1,13 @@
 "use strict";
 
-import { app, protocol, BrowserWindow } from "electron";
+import { app, protocol, BrowserWindow, ipcMain } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win;
+let win, settings;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -17,7 +17,7 @@ protocol.registerSchemesAsPrivileged([
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
+    width: 1400,
     height: 600,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -41,6 +41,37 @@ function createWindow() {
   });
 }
 
+ipcMain.on("settings", (event, data) => {
+  // create the window
+  settings = new BrowserWindow({
+    show: true,
+    width: 1440,
+    height: 900,
+    parent: win,
+    modal: true,
+    webPreferences: {
+      nodeIntegration: true,
+      plugins: true
+    }
+  });
+
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    // Load the url of the dev server if in development mode
+    settings.loadURL(process.env.WEBPACK_DEV_SERVER_URL + "settings.html");
+    if (!process.env.IS_TEST) settings.webContents.openDevTools();
+  } else {
+    settings.loadURL(`app://./settings.html`);
+  }
+
+  settings.on("closed", () => {
+    settings = null;
+  });
+
+  // here we can send the data to the new window
+  // settings.webContents.on("did-finish-load", () => {
+  //   settings.webContents.send("data", data);
+  // });
+});
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
@@ -76,7 +107,7 @@ app.on("ready", async () => {
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === "win32") {
-    process.on("message", data => {
+    process.on("message", (data) => {
       if (data === "graceful-exit") {
         app.quit();
       }
