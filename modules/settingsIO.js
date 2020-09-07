@@ -9,8 +9,6 @@ export default {
       return JSON.parse(buffer);
     } else throw Error("no settings");
   },
-  createDefalultSettings() {
-    const dir = prompt("choose dir to watch");
-    console.log(dir);
-  }
+  createDefalultSettings() {},
+  settingsWinConfig: { width: 600, height: 600 }
 };

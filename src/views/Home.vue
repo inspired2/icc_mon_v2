@@ -19,6 +19,7 @@
 
 <script>
 import { ipcRenderer } from "electron";
+import winConfig from "../../modules/settingsIO";
 
 export default {
   name: "Home",
@@ -28,15 +29,16 @@ export default {
   components: {},
   methods: {
     openModal(type) {
-      ipcRenderer.send("openModal", type);
+      ipcRenderer.send("openModal", {
+        url: type,
+        windowConfig: winConfig.settingsWinConfig
+      });
     }
   }
 };
 </script>
 
 <style scoped>
-.home-navbar {
-}
 * {
   border: 1px dotted #999;
 }

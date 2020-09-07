@@ -29,7 +29,7 @@ function createWindow() {
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
-    //if (!process.env.IS_TEST) win.webContents.openDevTools();
+    if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
     createProtocol("app");
     // Load the index.html when not in development
@@ -43,24 +43,27 @@ function createWindow() {
 
 ipcMain.on("openModal", (event, data) => {
   // create the window
-  modal = new BrowserWindow({
-    show: true,
-    width: 1440,
-    height: 900,
-    parent: win,
-    modal: true,
-    webPreferences: {
-      nodeIntegration: true,
-      plugins: true
-    }
-  });
+  modal = new BrowserWindow(
+    Object.assign(
+      {
+        show: true,
+        parent: win,
+        modal: true,
+        webPreferences: {
+          nodeIntegration: true,
+          plugins: true
+        }
+      },
+      data.windowConfig
+    )
+  );
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    modal.loadURL(process.env.WEBPACK_DEV_SERVER_URL + `${data}.html`);
+    modal.loadURL(process.env.WEBPACK_DEV_SERVER_URL + `${data.url}.html`);
     if (!process.env.IS_TEST) modal.webContents.openDevTools();
   } else {
-    modal.loadURL(`app://./${data}.html`);
+    modal.loadURL(`app://./${data.url}.html`);
   }
 
   modal.on("closed", () => {

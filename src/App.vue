@@ -7,12 +7,19 @@
 </template>
 <script>
 import IO from "../modules/settingsIO.js";
+import { ipcRenderer } from "electron";
+import winConfig from "../modules/settingsIO";
+
 {
   try {
     const settings = IO.readSettings();
     console.log(settings);
   } catch (e) {
     console.log("The error:" + e);
+    ipcRenderer.send("openModal", {
+      url: "settings",
+      windowConfig: winConfig.settingsWinConfig
+    });
     IO.createDefalultSettings();
   }
 }
