@@ -7,6 +7,7 @@ module.exports = {
   },
   pages: {
     index: "src/main.js", // your main window
-    settings: "src/subpages/settings.js" // your video window
+    settings: "src/subpages/settings.js",
+    convert: "src/subpages/convert.js" // your video window
   }
 };

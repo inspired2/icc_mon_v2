@@ -1,10 +1,23 @@
 <template>
-  <div id="app">outer
+  <div id="app">
+    outer
     <!-- <div id="nav"><router-link to="/">Home</router-link></div> -->
     <router-view />
   </div>
 </template>
-
+<script>
+import IO from "../modules/settingsIO.js";
+{
+  try {
+    const settings = IO.readSettings();
+    console.log(settings);
+  } catch (e) {
+    console.log("The error:" + e);
+    IO.createDefalultSettings();
+  }
+}
+export default {};
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

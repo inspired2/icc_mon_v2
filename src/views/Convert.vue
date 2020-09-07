@@ -1,9 +1,7 @@
 <template>
-  <div id="app" class="container">Settings</div>
+  <div id="app" class="container">Convert</div>
 </template>
 <script>
-//import fs from "fs";
-
 export default {};
 </script>
 

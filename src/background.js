@@ -7,7 +7,7 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win, settings;
+let win, modal;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -41,9 +41,9 @@ function createWindow() {
   });
 }
 
-ipcMain.on("settings", (event, data) => {
+ipcMain.on("openModal", (event, data) => {
   // create the window
-  settings = new BrowserWindow({
+  modal = new BrowserWindow({
     show: true,
     width: 1440,
     height: 900,
@@ -57,14 +57,14 @@ ipcMain.on("settings", (event, data) => {
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    settings.loadURL(process.env.WEBPACK_DEV_SERVER_URL + "settings.html");
-    if (!process.env.IS_TEST) settings.webContents.openDevTools();
+    modal.loadURL(process.env.WEBPACK_DEV_SERVER_URL + `${data}.html`);
+    if (!process.env.IS_TEST) modal.webContents.openDevTools();
   } else {
-    settings.loadURL(`app://./settings.html`);
+    modal.loadURL(`app://./${data}.html`);
   }
 
-  settings.on("closed", () => {
-    settings = null;
+  modal.on("closed", () => {
+    modal = null;
   });
 
   // here we can send the data to the new window
