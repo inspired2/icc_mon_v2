@@ -7,23 +7,24 @@
 </template>
 <script>
 import IO from "../modules/settingsIO.js";
-import { ipcRenderer } from "electron";
-import winConfig from "../modules/settingsIO";
 
-{
-  try {
+export default {
+  created() {
     const settings = IO.readSettings();
-    console.log(settings);
-  } catch (e) {
-    console.log("The error:" + e);
-    ipcRenderer.send("openModal", {
-      url: "settings",
-      windowConfig: winConfig.settingsWinConfig
-    });
-    IO.createDefalultSettings();
+    if (!settings) {
+      IO.createSettingsFile();
+      IO.openSettingsModal();
+    } else {
+      if (!IO.checkSettings(settings)) {
+        console.log(settings);
+        IO.openSettingsModal();
+      } else {
+        console.log(settings)
+        //write settings to the store
+      }
+    }
   }
-}
-export default {};
+};
 </script>
 <style>
 #app {
