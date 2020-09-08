@@ -15,12 +15,12 @@ export default {
       IO.createSettingsFile();
       IO.openSettingsModal();
     } else {
+      IO.updateAllSettings(settings);
+      console.log(settings);
       if (!IO.checkSettings(settings)) {
-        console.log(settings);
         IO.openSettingsModal();
       } else {
-        console.log(settings)
-        //write settings to the store
+        //IO.writeSetting(settings);
       }
     }
   }

@@ -1,11 +1,6 @@
 import fs from "fs";
 import { ipcRenderer } from "electron";
-
-const defaultSettings = {
-  pathToDir: "",
-  outputProfile: "",
-  pathToProfile: ""
-};
+import config from "../config";
 
 export default {
   readSettings() {
@@ -19,7 +14,7 @@ export default {
     }
   },
   createSettingsFile() {
-    fs.writeFileSync("./appSettings.json", JSON.stringify(defaultSettings));
+    fs.writeFileSync("./appSettings.json", JSON.stringify(config.settings));
   },
   checkSettings(object) {
     for (let key of Object.keys(object)) {
@@ -32,6 +27,15 @@ export default {
       url: "settings",
       windowConfig: this.settingsWinConfig
     });
+  },
+  updateAllSettings(settings) {
+    config.update("all", settings);
+  },
+  writeSetting(payload) {
+    config.update("all", payload);
+  },
+  writeSettingsFile() {
+    fs.writeFileSync("./appSettings.json", JSON.stringify(config.settings));
   },
   settingsWinConfig: { width: 600, height: 600 }
 };
