@@ -5,9 +5,9 @@
       <div class="col-3 row-header"></div>
       <div class="col-8 inner-container">
         <div class="row inner-container-row">
-          <div class="col-6 variable">{{ pathToDir }}</div>
+          <div class="col-6 variable">{{ settings }}</div>
           <div class="col-2 change-button">
-            <button @click="changeSettings">Settings</button>
+            <button @click="changeSettings">Change</button>
           </div>
         </div>
       </div>
@@ -23,30 +23,34 @@
 
 <script>
 import IO from "../../modules/settingsIO";
-import config from "../../config";
+import { mapGetters, mapMutations } from "vuex";
 const { dialog } = require("electron").remote;
 
 export default {
   data() {
     return {
-      settings: { pathToDir: "", outputProfile: "", pathToProfile: "" }
+      localSettings: { pathToDir: "", outputProfile: "", pathToProfile: "" }
     };
   },
   computed: {
+    ...mapGetters(["settings"]),
     pathToDir() {
-      return this.settings.pathToDir;
+      return this.localSettings.pathToDir;
     }
   },
   methods: {
+    ...mapMutations(["update"]),
+
     readCurrentSettings() {
-      this.settings = config.settings;
+      this.localSettings = this.settings;
     },
     changeLocalSettings(type, value) {
-      this.settings[type] = value;
+      this.localSettings[type] = value;
     },
     confirmChanges() {
-      IO.updateAllSettings(this.settings);
-      IO.writeSettingsFile();
+      //console.log(this.localSettings);
+      this.update({ field: "all", value: this.localSettings });
+      IO.writeSettingsFile(this.localSettings);
     },
     async changeSettings() {
       const path = dialog.showOpenDialog({
@@ -58,8 +62,9 @@ export default {
     }
   },
   created() {
-    console.log("in settings: ", config.settings);
     this.readCurrentSettings();
+    console.log("localSettings: ", this.localSettings);
+    console.log("globalSettings: ", this.settings)
   }
 };
 </script>

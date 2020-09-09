@@ -1,9 +1,8 @@
 import fs from "fs";
 import { ipcRenderer } from "electron";
-import config from "../config";
 
 export default {
-  readSettings() {
+  readSettingsFile() {
     try {
       const buffer = fs.readFileSync("./appSettings.json", "utf-8");
       if (buffer) {
@@ -13,8 +12,14 @@ export default {
       return null;
     }
   },
-  createSettingsFile() {
-    fs.writeFileSync("./appSettings.json", JSON.stringify(config.settings));
+  createSettingsFile(settings) {
+    try {
+      fs.writeFileSync("./appSettings.json", JSON.stringify(settings));
+    } catch (e) {
+      console.log("Error trying to write <appSettings.json>: " + e);
+      return false;
+    }
+    return true;
   },
   checkSettings(object) {
     for (let key of Object.keys(object)) {
@@ -28,14 +33,8 @@ export default {
       windowConfig: this.settingsWinConfig
     });
   },
-  updateAllSettings(settings) {
-    config.update("all", settings);
-  },
-  writeSetting(payload) {
-    config.update("all", payload);
-  },
-  writeSettingsFile() {
-    fs.writeFileSync("./appSettings.json", JSON.stringify(config.settings));
+  writeSettingsFile(settings) {
+    fs.writeFileSync("./appSettings.json", JSON.stringify(settings));
   },
   settingsWinConfig: { width: 600, height: 600 }
 };

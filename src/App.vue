@@ -7,15 +7,26 @@
 </template>
 <script>
 import IO from "../modules/settingsIO.js";
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
+  computed: {
+    ...mapGetters(["settings"])
+  },
+  methods: {
+    ...mapMutations(["update"]),
+    updGlobalSettings(fileData) {
+      this.update({ field: "all", value: fileData });
+    }
+  },
   created() {
-    const settings = IO.readSettings();
+    const settings = IO.readSettingsFile();
     if (!settings) {
-      IO.createSettingsFile();
+      const success = IO.createSettingsFile();
+      if (!success) console.log("unable to create settings file");
       IO.openSettingsModal();
     } else {
-      IO.updateAllSettings(settings);
+      this.updGlobalSettings(settings);
       console.log(settings);
       if (!IO.checkSettings(settings)) {
         IO.openSettingsModal();
