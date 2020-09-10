@@ -1,5 +1,4 @@
 import fs from "fs";
-import { ipcRenderer } from "electron";
 
 export default {
   readSettingsFile() {
@@ -27,14 +26,7 @@ export default {
     }
     return true;
   },
-  openSettingsModal() {
-    ipcRenderer.send("openModal", {
-      url: "settings",
-      windowConfig: this.settingsWinConfig
-    });
-  },
   writeSettingsFile(settings) {
     fs.writeFileSync("./appSettings.json", JSON.stringify(settings));
-  },
-  settingsWinConfig: { width: 600, height: 600 }
+  }
 };

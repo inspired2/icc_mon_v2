@@ -3,12 +3,12 @@
     <div class="home-navbar row">
       <div class="col-4 current-folder"></div>
       <div class="col-3 manual-convert">
-        <button @click="openModal('convert')" class="btn btn-secondary">
+        <button class="btn btn-secondary">
           converter
         </button>
       </div>
       <div class="col-3 settings">
-        <button @click="openModal('settings')" class="btn btn-secondary">
+        <button class="btn btn-secondary">
           settings
         </button>
       </div>
@@ -18,23 +18,13 @@
 </template>
 
 <script>
-import { ipcRenderer } from "electron";
-import winConfig from "../../modules/settingsIO";
-
 export default {
   name: "Home",
   data: () => {
     return {};
   },
   components: {},
-  methods: {
-    openModal(type) {
-      ipcRenderer.send("openModal", {
-        url: type,
-        windowConfig: winConfig.settingsWinConfig
-      });
-    }
-  }
+  methods: {}
 };
 </script>
 

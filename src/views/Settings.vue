@@ -5,7 +5,7 @@
       <div class="col-3 row-header"></div>
       <div class="col-8 inner-container">
         <div class="row inner-container-row">
-          <div class="col-6 variable">{{ settings }}</div>
+          <div class="col-6 variable">{{ pathToDir }}</div>
           <div class="col-2 change-button">
             <button @click="changeSettings">Change</button>
           </div>
@@ -27,6 +27,7 @@ import { mapGetters, mapMutations } from "vuex";
 const { dialog } = require("electron").remote;
 
 export default {
+  name: "Settings",
   data() {
     return {
       localSettings: { pathToDir: "", outputProfile: "", pathToProfile: "" }

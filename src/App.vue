@@ -20,16 +20,17 @@ export default {
     }
   },
   created() {
+    console.log("started")
     const settings = IO.readSettingsFile();
     if (!settings) {
       const success = IO.createSettingsFile();
       if (!success) console.log("unable to create settings file");
-      IO.openSettingsModal();
+      this.$router.push({ name: "Settings" });
     } else {
       this.updGlobalSettings(settings);
       console.log(settings);
       if (!IO.checkSettings(settings)) {
-        IO.openSettingsModal();
+        this.$router.push({ name: "Settings" });
       } else {
         //IO.writeSetting(settings);
       }
