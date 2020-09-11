@@ -13,11 +13,11 @@ export default new Vuex.Store({
   },
   mutations: {
     update(state, payload) {
-      console.log("called update mutation")
+      console.log("called update mutation");
       if (payload.field === "all") {
         console.log("update all", payload.value);
         state.settings = payload.value;
-        console.log("current state: ", state.settings)
+        console.log("current state: ", state.settings);
       } else state.settings[payload.field] = payload.value;
     }
   },

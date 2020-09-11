@@ -16,7 +16,8 @@
     <div class="row profile"></div>
     <div class="row log"></div>
     <div class="row confirm-button">
-      <button @click="confirmChanges" class="confirm">confirm</button>
+      <button @click="confirmChanges" class="confirm col-3">confirm</button>
+      <button @click="cancelChanges" class="confirm col-3">cancel</button>
     </div>
   </div>
 </template>
@@ -43,29 +44,32 @@ export default {
     ...mapMutations(["update"]),
 
     readCurrentSettings() {
-      this.localSettings = this.settings;
+      this.localSettings = { ...this.settings };
     },
     changeLocalSettings(type, value) {
       this.localSettings[type] = value;
     },
     confirmChanges() {
-      //console.log(this.localSettings);
-      this.update({ field: "all", value: this.localSettings });
+      this.update({ field: "all", value: { ...this.localSettings } });
       IO.writeSettingsFile(this.localSettings);
+      this.$router.push({ name: "Home" });
+    },
+    cancelChanges() {
+      this.$router.push({ name: "Home" });
     },
     async changeSettings() {
       const path = dialog.showOpenDialog({
         properties: ["openDirectory"]
       });
       await path.then(e => {
-        this.changeLocalSettings("pathToDir", e.filePaths[0]);
+        if (e.filePaths[0]) {
+          this.changeLocalSettings("pathToDir", e.filePaths[0]);
+        }
       });
     }
   },
   created() {
     this.readCurrentSettings();
-    console.log("localSettings: ", this.localSettings);
-    console.log("globalSettings: ", this.settings)
   }
 };
 </script>

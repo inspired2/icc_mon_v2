@@ -1,14 +1,17 @@
 <template>
   <div class="home container">
     <div class="home-navbar row">
-      <div class="col-4 current-folder"></div>
+      <div class="col-4 current-folder">{{ settings.pathToDir }}</div>
       <div class="col-3 manual-convert">
         <button class="btn btn-secondary">
           converter
         </button>
       </div>
       <div class="col-3 settings">
-        <button class="btn btn-secondary">
+        <button
+          @click="$router.push({ name: 'Settings' })"
+          class="btn btn-secondary"
+        >
           settings
         </button>
       </div>
@@ -18,10 +21,14 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   name: "Home",
   data: () => {
     return {};
+  },
+  computed: {
+    ...mapGetters(["settings"])
   },
   components: {},
   methods: {}
