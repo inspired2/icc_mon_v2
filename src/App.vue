@@ -20,10 +20,10 @@ export default {
     }
   },
   created() {
-    console.log("started")
+    console.log("started");
     const settings = IO.readSettingsFile();
     if (!settings) {
-      const success = IO.createSettingsFile();
+      const success = IO.createSettingsFile(this.settings);
       if (!success) console.log("unable to create settings file");
       this.$router.push({ name: "Settings" });
     } else {

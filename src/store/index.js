@@ -8,7 +8,8 @@ export default new Vuex.Store({
     settings: {
       pathToDir: "",
       outputProfile: "",
-      pathToProfile: ""
+      pathToProfile: "",
+      exceptionFolder: ""
     }
   },
   mutations: {
