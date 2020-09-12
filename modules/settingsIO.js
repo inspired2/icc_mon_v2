@@ -1,4 +1,6 @@
 import fs from "fs";
+import config from "./../config";
+const settingsFilePath = config.settingsFilePath + config.settingsFileName;
 
 export default {
   readSettingsFile() {
@@ -13,7 +15,7 @@ export default {
   },
   createSettingsFile(settings) {
     try {
-      fs.writeFileSync("./appSettings.json", JSON.stringify(settings));
+      fs.writeFileSync(settingsFilePath, JSON.stringify(settings));
     } catch (e) {
       console.log("Error trying to write <appSettings.json>: " + e);
       return false;
@@ -27,6 +29,9 @@ export default {
     return true;
   },
   writeSettingsFile(settings) {
-    fs.writeFileSync("./appSettings.json", JSON.stringify(settings));
+    fs.writeFileSync(settingsFilePath, JSON.stringify(settings));
+  },
+  copySelectedFile(sourcePath, destination) {
+
   }
 };

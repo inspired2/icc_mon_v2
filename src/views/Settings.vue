@@ -1,28 +1,33 @@
 <template>
   <div id="app" class="container">
     Settings
-    <div class="row working-directory">
-      <div class="col-3 row-header"></div>
-      <div class="col-8 inner-container">
-        <div class="row inner-container-row">
-          <div class="col-6 variable">{{ pathToDir }}</div>
-          <div class="col-2 change-button">
-            <button @click="changePath('pathToDir')">Change</button>
-          </div>
-        </div>
+    <div class="row working-folder-container">
+      <div class="col-4 working-folder title">Путь к рабочему каталогу</div>
+      <div class="col-6 working-folder variable">{{ pathToDir }}</div>
+      <div class="col-2 change-button">
+        <button @click="changePath('pathToDir')">Change</button>
       </div>
     </div>
     <div class="row exception">
-      <div class="col-6 variable">{{ exceptionFolder }}</div>
+      <div class="col-4 exception title">Не сканировать в:</div>
+      <div class="col-6 exception variable">{{ exceptionFolder }}</div>
       <div class="col-2 change-button">
         <button @click="changePath('exceptionFolder')">Change</button>
       </div>
     </div>
-    <div class="row profile"></div>
-    <div class="row log"></div>
+    <div class="row profile-info">
+      <div class="col-4 profile-title">Конвертировать в:</div>
+      <div class="col-6 variable">{{ profileDescriptor }}</div>
+      <div class="col-2 profile-select">
+        <button class="profile-select">Выбор файла профиля</button>
+      </div>
+    </div>
+    <div class="row log">
+      <button class="col-12 log-button">Показать лог</button>
+    </div>
     <div class="row confirm-button">
-      <button @click="confirmChanges" class="confirm col-3">confirm</button>
-      <button @click="cancelChanges" class="confirm col-3">cancel</button>
+      <button @click="confirmChanges" class="confirm col-6">confirm</button>
+      <button @click="cancelChanges" class="confirm col-6">cancel</button>
     </div>
   </div>
 </template>
@@ -51,6 +56,9 @@ export default {
     },
     exceptionFolder() {
       return this.localSettings.exceptionFolder;
+    },
+    profileDescriptor() {
+      return this.localSettings.outputProfile;
     }
   },
   methods: {
@@ -79,6 +87,18 @@ export default {
           this.changeLocalSettings(pathType, e.filePaths[0]);
         }
       });
+    },
+    async selectProfile() {
+      const path = dialog.showOpenDialog({
+        properties: ["openFile"],
+        filters: {
+          name: "файл профиля",
+          extensions: ["icc", "icm"]
+        }
+      });
+      await path.then(e => {
+        
+      })
     }
   },
   created() {
