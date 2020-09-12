@@ -1,6 +1,9 @@
 import fs from "fs";
 import config from "./../config";
 const settingsFilePath = config.settingsFilePath + config.settingsFileName;
+const profileDestinationPath = config.iccProfileDestination;
+//const exif = require("exifreader")
+import { parse } from "icc";
 
 export default {
   readSettingsFile() {
@@ -31,7 +34,14 @@ export default {
   writeSettingsFile(settings) {
     fs.writeFileSync(settingsFilePath, JSON.stringify(settings));
   },
-  copySelectedFile(sourcePath, destination) {
-
+  copySelectedFile(sourcePath) {
+    console.dir({ sourcePath, profileDestinationPath });
+    const buffer = fs.readFileSync(sourcePath);
+    fs.writeFileSync(profileDestinationPath + "test.icc", buffer);
+    const iccInfo = parse(buffer);
+    return new Promise((resolve, reject) => {
+      if (iccInfo) resolve(iccInfo);
+      else reject("cudnt read profile data");
+    });
   }
 };

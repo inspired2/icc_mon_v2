@@ -19,7 +19,9 @@
       <div class="col-4 profile-title">Конвертировать в:</div>
       <div class="col-6 variable">{{ profileDescriptor }}</div>
       <div class="col-2 profile-select">
-        <button class="profile-select">Выбор файла профиля</button>
+        <button @click="selectProfile()" class="profile-select">
+          Выбор файла профиля
+        </button>
       </div>
     </div>
     <div class="row log">
@@ -91,14 +93,19 @@ export default {
     async selectProfile() {
       const path = dialog.showOpenDialog({
         properties: ["openFile"],
-        filters: {
-          name: "файл профиля",
-          extensions: ["icc", "icm"]
-        }
+        filters: [
+          {
+            name: "файл профиля",
+            extensions: ["icc", "icm"]
+          }
+        ]
       });
-      await path.then(e => {
-        
-      })
+      await path
+        .then(e => {
+          console.log(e);
+          return IO.copySelectedFile(e.filePaths[0]);
+        })
+        .then(e => console.log(e));
     }
   },
   created() {
