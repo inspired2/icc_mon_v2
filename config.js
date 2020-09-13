@@ -1,5 +1,11 @@
 export default {
-  settingsFileName: "appSettings",
+  settingsFileName: "appSettings.json",
   settingsFilePath: "./",
-  iccProfileDestination: "./"
+  iccProfileDestination: "./",
+  validators: {
+    pathToDir: "path",
+    outputProfile: "file",
+    profileDir: "profile",
+    exceptionFolder: "path"
+  }
 };

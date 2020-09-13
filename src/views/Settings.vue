@@ -37,6 +37,7 @@
 <script>
 import IO from "../../modules/settingsIO";
 import { mapGetters, mapMutations } from "vuex";
+// import config from "./../../config";
 const { dialog } = require("electron").remote;
 
 export default {
@@ -75,6 +76,9 @@ export default {
     confirmChanges() {
       this.update({ field: "all", value: { ...this.localSettings } });
       IO.writeSettingsFile(this.localSettings);
+      if (this.pathToProfile) {
+        IO.copySelectedFile(this.pathToProfile, this.fileName);
+      }
       this.$router.push({ name: "Home" });
     },
     cancelChanges() {
@@ -100,12 +104,14 @@ export default {
           }
         ]
       });
-      await path
-        .then(e => {
-          console.log(e);
-          return IO.copySelectedFile(e.filePaths[0]);
-        })
-        .then(e => console.log(e));
+      await path.then(e => {
+        if (e.filePaths[0]) {
+          this.localSettings.pathToProfile = e.filePaths[0];
+          const profile = IO.readProfile(this.localSettings.pathToProfile);
+          const profileDescriptor = IO.getIccDesc(profile);
+          this.localSettings.outputProfile = profileDescriptor;
+        }
+      });
     }
   },
   created() {

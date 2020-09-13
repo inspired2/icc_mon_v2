@@ -17,24 +17,38 @@ export default {
     ...mapMutations(["update"]),
     updGlobalSettings(fileData) {
       this.update({ field: "all", value: fileData });
+    },
+    checkSettings() {
+      const settings = IO.readSettingsFile();
+      if (!settings) {
+        IO.createSettingsFile(this.settings);
+        this.$router.push({ name: "Settings" });
+      } else {
+        this.updGlobalSettings(settings);
+        this.validate(this.settings);
+      }
+    },
+    validate(settings) {
+      let isValid = true;
+      for (let param of Object.keys(settings)) {
+        let fieldIsValid = IO.checkField[param](settings[param]);
+        if (!fieldIsValid) {
+          isValid = false;
+          this.update({ field: param, value: "" });
+          //!!!maybe add jsonSettings modify here??
+          if (param === "pathToProfile") {
+            this.update({ field: "outputProfile", value: "" });
+          }
+        }
+      }
+      console.log(isValid);
+      if (!isValid) {
+        this.$router.push({ name: "Settings" });
+      }
     }
   },
   created() {
-    console.log("started");
-    const settings = IO.readSettingsFile();
-    if (!settings) {
-      const success = IO.createSettingsFile(this.settings);
-      if (!success) console.log("unable to create settings file");
-      this.$router.push({ name: "Settings" });
-    } else {
-      this.updGlobalSettings(settings);
-      console.log(settings);
-      if (!IO.checkSettings(settings)) {
-        this.$router.push({ name: "Settings" });
-      } else {
-        //IO.writeSetting(settings);
-      }
-    }
+    this.checkSettings();
   }
 };
 </script>
