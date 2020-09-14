@@ -31,8 +31,17 @@ export default {
     validate(settings) {
       let isValid = true;
       for (let param of Object.keys(settings)) {
-        let fieldIsValid = IO.checkField[param](settings[param]);
-        if (!fieldIsValid) {
+        IO.checkField[param] = IO.checkField[param].bind(IO);
+        let checkResult = IO.checkField[param](settings[param]);
+        if (typeof checkResult === "object") {
+          let { iccDesc } = checkResult;
+          if (settings.outputProfile !== iccDesc) {
+            isValid = false;
+            this.update({ field: "outputProfile", value: "" });
+            this.update({ field: param, value: "" });
+          }
+        }
+        if (!checkResult) {
           isValid = false;
           this.update({ field: param, value: "" });
           //!!!maybe add jsonSettings modify here??

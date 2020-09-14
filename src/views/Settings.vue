@@ -49,7 +49,8 @@ export default {
         outputProfile: "",
         pathToProfile: "",
         exceptionFolder: ""
-      }
+      },
+      copyPath: ""
     };
   },
   computed: {
@@ -74,11 +75,11 @@ export default {
       this.localSettings[type] = value;
     },
     confirmChanges() {
+      if (this.copyPath) {
+        this.localSettings.pathToProfile = IO.copySelectedFile(this.copyPath);
+      }
       this.update({ field: "all", value: { ...this.localSettings } });
       IO.writeSettingsFile(this.localSettings);
-      if (this.pathToProfile) {
-        IO.copySelectedFile(this.pathToProfile, this.fileName);
-      }
       this.$router.push({ name: "Home" });
     },
     cancelChanges() {
@@ -106,8 +107,8 @@ export default {
       });
       await path.then(e => {
         if (e.filePaths[0]) {
-          this.localSettings.pathToProfile = e.filePaths[0];
-          const profile = IO.readProfile(this.localSettings.pathToProfile);
+          this.copyPath = e.filePaths[0];
+          const profile = IO.readProfile(this.copyPath);
           const profileDescriptor = IO.getIccDesc(profile);
           this.localSettings.outputProfile = profileDescriptor;
         }

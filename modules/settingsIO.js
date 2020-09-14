@@ -36,13 +36,14 @@ export default {
   writeSettingsFile(settings) {
     fs.writeFileSync(settingsFilePath, JSON.stringify(settings));
   },
-  copySelectedFile(sourcePath, fileName) {
+  copySelectedFile(sourcePath) {
     const buffer = fs.readFileSync(sourcePath);
-    fs.writeFileSync(profileDestinationPath + fileName, buffer);
-    return new Promise((resolve, reject) => {
-      if (buffer) resolve(buffer);
-      else reject("cudn't read profile data");
-    });
+    const newPath = profileDestinationPath + sourcePath.match(/[^\\/]+.icc\b/);
+    if (!fs.existsSync(profileDestinationPath)) {
+      fs.mkdirSync(profileDestinationPath);
+    }
+    fs.writeFileSync(newPath, buffer);
+    return newPath;
   },
   getIccDesc(buffer) {
     return parse(buffer).description;
@@ -66,9 +67,9 @@ export default {
     pathToProfile(path) {
       const bool = !!path && this.pathExists(path);
       if (!bool) return false;
-      //const profile = fs.readFileSync(path);
-      //!!! add path validation;
-      return true;
+      const profile = fs.readFileSync(path);
+      const iccDesc = this.getIccDesc(profile);
+      return { iccDesc };
     },
     exceptionFolder(folder) {
       if (folder && this.pathExists(folder)) return true;
