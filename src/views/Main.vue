@@ -2,15 +2,16 @@
   <div id="main" class="container">
     <h1>Main</h1>
     <div id="folders" class="row working-folders"></div>
+    <button @click="addWatcherComponent">add component</button>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import FolderWorker from "../views/FolderWorker";
+import FolderComponent from "../views/FolderComponent";
 const chokidar = require("chokidar");
 const path = require("path");
-const div = document.querySelector("#folders");
+//const div = document.querySelector("#folders");
 
 export default {
   data() {
@@ -18,7 +19,7 @@ export default {
   },
   components: {
     // eslint-disable-next-line vue/no-unused-components
-    "folder-worker": FolderWorker
+    "folder-component": FolderComponent
   },
   computed: {
     ...mapGetters(["settings"])
@@ -44,8 +45,8 @@ export default {
           console.log(err);
         });
     },
-    addWatcherComponent(path) {
-      console.log(path);
+    addWatcherComponent() {
+      const div = document.querySelector("#folders");
       let component = document.createElement("folder-worker");
       console.log(div, component);
       div.prepend(component);
