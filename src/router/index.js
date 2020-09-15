@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Settings from "../views/Settings.vue";
+//import Main from "../views/Main";
 
 Vue.use(VueRouter);
 
@@ -16,6 +17,11 @@ const routes = [
     name: "Settings",
     component: Settings
   }
+  // {
+  //   path: "/main",
+  //   name: "Main",
+  //   component: Main
+  // }
   // {
   //   path: "/about",
   //   name: "About",

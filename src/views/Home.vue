@@ -17,11 +17,16 @@
       </div>
     </div>
     <h1>APP</h1>
+    <div class="row main-view">
+      <main-component></main-component>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import Main from "../views/Main";
+
 export default {
   name: "Home",
   data: () => {
@@ -30,7 +35,7 @@ export default {
   computed: {
     ...mapGetters(["settings"])
   },
-  components: {},
+  components: { "main-component": Main },
   methods: {}
 };
 </script>

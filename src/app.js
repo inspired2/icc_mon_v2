@@ -60,11 +60,9 @@ export default { counter };
 
 watcher
   .on("addDir", dir => {
-    //if(dirIsWatchPending(dir)) {
     emitter.emit("newOrder", dir);
     startDirWatcher(dir);
     console.log("Папка с заказом: " + dir);
-    //}
   })
   .on("error", error => {
     console.log(error);
@@ -138,11 +136,6 @@ function writeError(error) {
     if (err) console.log("cannot write error to file: " + errPath);
   });
 }
-
-/*function dirIsWatchPending(dir) {
-	if () return true;
-	else return false;
-}*/
 
 function startDirWatcher(subDir) {
   const subWatcher = chokidar.watch(subDir, {
