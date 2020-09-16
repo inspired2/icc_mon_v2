@@ -8,5 +8,6 @@ export default {
     profileDir: "profile",
     exceptionFolder: "path"
   },
-  autostartFileWatcher: true
+  autostartFileWatcher: true,
+  iccConvertExt: [".jpg", ".jpeg", ".tiff", ".tif"]
 };

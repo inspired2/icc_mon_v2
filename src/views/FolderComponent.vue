@@ -9,11 +9,11 @@ import config from "../../config";
 import taskManager from "../../workers/taskManager.js";
 const pathParse = require("path");
 const chokidar = require("chokidar");
-const EventEmitter = require("events");
+// const EventEmitter = require("events");
 // const emitter = new EventEmitter();
 
 export default {
-  data: () => {
+  data() {
     return {
       fileList: []
     };
@@ -25,23 +25,36 @@ export default {
     }
   },
   methods: {
+    isCheckPending(path) {
+      const ext = pathParse.parse(path).ext.toLowerCase();
+      const extensions = config.iccConvertExt;
+      if (extensions.indexOf(ext) === -1) {
+        return false;
+      }
+      return true;
+    },
     startFileWatcher(path) {
       const watcher = chokidar.watch(path, {
         ignored: /[/\\]\./,
         persistent: false,
         awaitWriteFinish: true,
+        ignoreInitial: false,
         ignorePermissionErrors: true,
         usePolling: true
       });
       watcher
         .on("add", file => {
-          this.fileList.push(file);
+          if (this.isCheckPending(file)) {
+            console.log("add to list: ", file);
+            this.fileList.push(file);
+          }
+        })
+        .on("ready", () => {
+          console.log("run check");
+          if (this.fileList.length) taskManager.check(this.fileList);
         })
         .on("error", err => {
           console.log(err);
-        })
-        .on("ready", () => {
-          console.log(this.fileList);
         });
     }
   },
@@ -49,6 +62,7 @@ export default {
     if (config.autostartFileWatcher) {
       this.startFileWatcher(this.path);
     }
+    taskManager.on("message", console.log);
   }
 };
 </script>
