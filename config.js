@@ -7,5 +7,6 @@ export default {
     outputProfile: "file",
     profileDir: "profile",
     exceptionFolder: "path"
-  }
+  },
+  autostartFileWatcher: true
 };

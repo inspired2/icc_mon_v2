@@ -1,8 +1,16 @@
 <template>
   <div id="main" class="container">
     <h1>Main</h1>
-    <div id="folders" class="row working-folders"></div>
-    <button @click="addWatcherComponent">add component</button>
+    <div id="folders" class="row working-folders">
+      <folder-component
+        :key="folder"
+        :path="folder"
+        class="worker"
+        v-for="folder in folders"
+      >
+        {{ folder }}
+      </folder-component>
+    </div>
   </div>
 </template>
 
@@ -11,14 +19,14 @@ import { mapGetters } from "vuex";
 import FolderComponent from "../views/FolderComponent";
 const chokidar = require("chokidar");
 const path = require("path");
-//const div = document.querySelector("#folders");
 
 export default {
   data() {
-    return {};
+    return {
+      folders: []
+    };
   },
   components: {
-    // eslint-disable-next-line vue/no-unused-components
     "folder-component": FolderComponent
   },
   computed: {
@@ -34,22 +42,29 @@ export default {
         usePolling: true,
         persistent: false,
         awaitWriteFinish: true,
-        ignoreInitial: true,
+        ignoreInitial: false,
         ignorePermissionErrors: true
       });
       watcher
         .on("addDir", dir => {
+          console.log("dir added: ", dir);
           this.addWatcherComponent(dir);
+        })
+        .on("unlinkDir", dir => {
+          this.removeWatcherComponent(dir);
+          console.log("dir removed: ", dir);
         })
         .on("error", err => {
           console.log(err);
         });
+      console.log(watcher);
     },
-    addWatcherComponent() {
-      const div = document.querySelector("#folders");
-      let component = document.createElement("folder-worker");
-      console.log(div, component);
-      div.prepend(component);
+    addWatcherComponent(id) {
+      this.folders.push(id);
+    },
+    removeWatcherComponent(id) {
+      const idx = this.folders.indexOf(id);
+      this.folders.splice(idx, 1);
     }
   },
   created() {

@@ -3,7 +3,6 @@ import config from "./../config";
 
 const settingsFilePath = config.settingsFilePath + config.settingsFileName;
 const profileDestinationPath = config.iccProfileDestination;
-//const exif = require("exifreader")
 import { parse } from "icc";
 
 export default {
