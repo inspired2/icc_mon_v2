@@ -6,6 +6,7 @@
 
 <script>
 import config from "../../config";
+// eslint-disable-next-line no-unused-vars
 //import taskManager from "../../workers/taskManager.js";
 const pathParse = require("path");
 const chokidar = require("chokidar");
@@ -36,8 +37,8 @@ export default {
       return true;
     },
     startFileWatcher(path) {
-      const list = this.fileList,
-        id = pathParse.basename(path);
+      const list = this.fileList;
+      const id = pathParse.basename(path);
       const watcher = chokidar.watch(path, {
         ignored: /[/\\]\./,
         persistent: true,
@@ -53,10 +54,11 @@ export default {
           }
         })
         .on("ready", () => {
-          emitter.on(`${id}done`, e => {
+          emitter.on(`${id}done`, () => {
             emitter.unsubscribe(`${id}done`);
           });
           if (this.fileList.length) {
+            console.log("emit startCheck");
             emitter.emit("startCheck", { list, id });
           }
         })
