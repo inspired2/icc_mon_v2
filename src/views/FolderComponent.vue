@@ -6,11 +6,10 @@
 
 <script>
 import config from "../../config";
-import taskManager from "../../workers/taskManager.js";
+//import taskManager from "../../workers/taskManager.js";
 const pathParse = require("path");
 const chokidar = require("chokidar");
-// const EventEmitter = require("events");
-// const emitter = new EventEmitter();
+import { emitter } from "./../../workers/EventBus";
 
 export default {
   data() {
@@ -25,8 +24,11 @@ export default {
     }
   },
   methods: {
+    getExt(path) {
+      return pathParse.parse(path).ext.toLowerCase();
+    },
     isCheckPending(path) {
-      const ext = pathParse.parse(path).ext.toLowerCase();
+      const ext = this.getExt(path);
       const extensions = config.iccConvertExt;
       if (extensions.indexOf(ext) === -1) {
         return false;
@@ -34,9 +36,11 @@ export default {
       return true;
     },
     startFileWatcher(path) {
+      const list = this.fileList,
+        id = pathParse.basename(path);
       const watcher = chokidar.watch(path, {
         ignored: /[/\\]\./,
-        persistent: false,
+        persistent: true,
         awaitWriteFinish: true,
         ignoreInitial: false,
         ignorePermissionErrors: true,
@@ -45,13 +49,16 @@ export default {
       watcher
         .on("add", file => {
           if (this.isCheckPending(file)) {
-            console.log("add to list: ", file);
             this.fileList.push(file);
           }
         })
         .on("ready", () => {
-          console.log("run check");
-          if (this.fileList.length) taskManager.check(this.fileList);
+          emitter.on(`${id}done`, e => {
+            emitter.unsubscribe(`${id}done`);
+          });
+          if (this.fileList.length) {
+            emitter.emit("startCheck", { list, id });
+          }
         })
         .on("error", err => {
           console.log(err);
@@ -62,7 +69,6 @@ export default {
     if (config.autostartFileWatcher) {
       this.startFileWatcher(this.path);
     }
-    taskManager.on("message", console.log);
   }
 };
 </script>
