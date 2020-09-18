@@ -15,7 +15,7 @@ const chokidar = require("chokidar");
 export default {
   data() {
     return {
-      timestamp: null,
+      filesAmount: undefined,
       fileList: []
     };
   },
@@ -53,16 +53,18 @@ export default {
           if (this.isCheckPending(file)) {
             this.fileList.push(file);
           }
-          this.timestamp = new Date().getTime();
+          if (this.getExt(file) == ".mrk") {
+            this.filesAmount = +pathParse.basename(file).match(/\d+/);
+          }
+          if (this.filesAmount && this.fileList.length == this.filesAmount) {
+            ipcRenderer.send("startCheck", { list, id });
+          }
         })
         .on("ready", () => {
           console.log("ready", id, list);
           ipcRenderer.once(`${id}done`, (event, job) => {
             console.log(job);
           });
-          if (this.fileList.length) {
-            ipcRenderer.send("startCheck", { list, id });
-          }
         })
         .on("error", err => {
           console.log(err);

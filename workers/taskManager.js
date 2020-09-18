@@ -20,6 +20,7 @@ function checkQueue() {
   if (jobQueue.length && workers.length) {
     const job = jobQueue.shift();
     const worker = workers.pop();
+    console.log("extracted worker, left: " + workers.length)
     startCheck(job, worker);
   }
 }
@@ -29,6 +30,7 @@ function startCheck(jobObj, thread) {
   worker.on(`message`, list => {
     console.log("worker result: ", id, list);
     win.webContents.send(`${id}done`, { id, list });
+    workers.push(worker);
   });
   worker.on("error", err => {
     console.log(err);
@@ -42,9 +44,3 @@ function spawnWorkers(noOfThreads) {
   }
   return workers;
 }
-// const jobs = new Map();
-// cpus.forEach(() => {
-//   const worker = new Thread("../workers/converter.js");
-//   worker.on("ready", data => this.emit("ready", data));
-//   workers.push(worker);
-// });
