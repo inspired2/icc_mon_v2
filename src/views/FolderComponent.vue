@@ -5,16 +5,17 @@
 </template>
 
 <script>
+import { ipcRenderer } from "electron";
 import config from "../../config";
 // eslint-disable-next-line no-unused-vars
 //import taskManager from "../../workers/taskManager.js";
 const pathParse = require("path");
 const chokidar = require("chokidar");
-import { emitter } from "./../../workers/EventBus";
 
 export default {
   data() {
     return {
+      timestamp: null,
       fileList: []
     };
   },
@@ -52,14 +53,15 @@ export default {
           if (this.isCheckPending(file)) {
             this.fileList.push(file);
           }
+          this.timestamp = new Date().getTime();
         })
         .on("ready", () => {
-          emitter.on(`${id}done`, () => {
-            emitter.unsubscribe(`${id}done`);
+          console.log("ready", id, list);
+          ipcRenderer.once(`${id}done`, (event, job) => {
+            console.log(job);
           });
           if (this.fileList.length) {
-            console.log("emit startCheck");
-            emitter.emit("startCheck", { list, id });
+            ipcRenderer.send("startCheck", { list, id });
           }
         })
         .on("error", err => {

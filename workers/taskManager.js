@@ -1,4 +1,5 @@
-import { emitter } from "./EventBus.js";
+import { ipcMain } from "electron";
+import { win } from "./../src/background";
 // eslint-disable-next-line no-unused-vars
 const path = require("path");
 const os = require("os");
@@ -8,11 +9,10 @@ const { Worker } = require("worker_threads");
 //const worker = new Worker("./workers/checker.js")
 const workers = spawnWorkers(cpus);
 const jobQueue = [];
-emitter.on("startCheck", job => {
+
+ipcMain.on("startCheck", (e, job) => {
   jobQueue.push(job);
-  console.log("job, jobQueue");
 });
-console.log(emitter.evts());
 
 setInterval(checkQueue, 100);
 
@@ -26,9 +26,9 @@ function checkQueue() {
 function startCheck(jobObj, thread) {
   const { id, list } = jobObj;
   const worker = thread;
-  worker.on(`message`, evt => {
-    console.log(evt);
-    emitter.emit(`${id}done`, { id, list: evt.result });
+  worker.on(`message`, list => {
+    console.log("worker result: ", id, list);
+    win.webContents.send(`${id}done`, { id, list });
   });
   worker.on("error", err => {
     console.log(err);
