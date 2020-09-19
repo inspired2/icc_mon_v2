@@ -1,8 +1,10 @@
 const { parentPort } = require("worker_threads");
 const fs = require("fs");
-const path = require("path");
-const gm = require("gm");
+
+//const path = require("path");
+//const gm = require("gm");
 const ExifReader = require("exifreader");
+
 // const defaultState = () => ({
 //   fileList: [],
 //   id: null,
@@ -29,13 +31,15 @@ async function checker(job) {
   const list = [...job];
   while (list.length) {
     const filePath = list.pop();
-    const buffer = await fs.readFileSync(filePath);
+    const buffer = fs.readFileSync(filePath);
     if (buffer) {
-      output.push(filePath);
+      const tags = ExifReader.load(buffer, { expanded: true });
+      output.push(tags);
     }
   }
+  console.log("worker finished, returning result: ", output.length);
   return output;
 }
-async function getProfileDescriptor(buffer) {
-  
-}
+// async function getProfileDescriptor(buffer) {
+
+// }

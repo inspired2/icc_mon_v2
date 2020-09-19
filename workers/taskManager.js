@@ -11,31 +11,36 @@ const workers = spawnWorkers(cpus);
 const jobQueue = [];
 
 ipcMain.on("startCheck", (e, job) => {
+  console.log("TM recieved job: ", job.id);
   jobQueue.push(job);
 });
 
 setInterval(checkQueue, 100);
+setInterval(() => {
+  console.log("free workers: ", workers.length);
+}, 2000);
 
 function checkQueue() {
   if (jobQueue.length && workers.length) {
     const job = jobQueue.shift();
-    const worker = workers.pop();
-    console.log("extracted worker, left: " + workers.length)
+    let worker = workers.pop();
+    console.log("extracted worker, left: " + workers.length);
     startCheck(job, worker);
+    worker = null;
   }
 }
 function startCheck(jobObj, thread) {
   const { id, list } = jobObj;
-  const worker = thread;
-  worker.on(`message`, list => {
-    console.log("worker result: ", id, list);
+  console.log("starting worker for ", id);
+  thread.on(`message`, list => {
+    console.log("taskManager recieved worker result: ", id);
     win.webContents.send(`${id}done`, { id, list });
-    workers.push(worker);
+    workers.push(thread);
   });
-  worker.on("error", err => {
+  thread.on("error", err => {
     console.log(err);
   });
-  worker.postMessage(list);
+  thread.postMessage(list);
 }
 function spawnWorkers(noOfThreads) {
   const workers = [];

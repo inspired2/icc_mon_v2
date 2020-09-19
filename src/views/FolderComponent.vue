@@ -40,6 +40,12 @@ export default {
     startFileWatcher(path) {
       const list = this.fileList;
       const id = pathParse.basename(path);
+
+      ipcRenderer.once(`${id}done`, (event, job) => {
+        console.log(job);
+        console.log(watcher.getWatched())
+      });
+
       const watcher = chokidar.watch(path, {
         ignored: /[/\\]\./,
         persistent: true,
@@ -50,21 +56,18 @@ export default {
       });
       watcher
         .on("add", file => {
+          console.log("added file ");
           if (this.isCheckPending(file)) {
             this.fileList.push(file);
           }
           if (this.getExt(file) == ".mrk") {
+            console.log("found mrk", file);
             this.filesAmount = +pathParse.basename(file).match(/\d+/);
           }
           if (this.filesAmount && this.fileList.length == this.filesAmount) {
+            console.log("sending job to TM ", id)
             ipcRenderer.send("startCheck", { list, id });
           }
-        })
-        .on("ready", () => {
-          console.log("ready", id, list);
-          ipcRenderer.once(`${id}done`, (event, job) => {
-            console.log(job);
-          });
         })
         .on("error", err => {
           console.log(err);
