@@ -5,41 +5,20 @@ const fs = require("fs");
 //const gm = require("gm");
 const ExifReader = require("exifreader");
 
-// const defaultState = () => ({
-//   fileList: [],
-//   id: null,
-//   output: []
-// });
-// const state = {
-//   fileList: [],
-//   id: null,
-//   output: []
-// };
-// const resetState = () => Object.assign(state, defaultState());
-// //resetState();
-
 parentPort.on("message", async job => {
-  //console.log(data);
-  await checker(job).then(data => {
-    parentPort.postMessage(data);
+  const { id, file } = job;
+
+  await checker(file).then(tags => {
+    parentPort.postMessage({ id, tags });
   });
 });
-//const promise = new Promise((resolve, reject) => {});
 
-async function checker(job) {
-  const output = [];
-  const list = [...job];
-  while (list.length) {
-    const filePath = list.pop();
-    const buffer = fs.readFileSync(filePath);
-    if (buffer) {
-      const tags = ExifReader.load(buffer, { expanded: true });
-      output.push(tags);
-    }
+async function checker(file) {
+  const buffer = fs.readFileSync(file);
+  if (buffer) {
+    const tags = ExifReader.load(buffer, { expanded: true });
+    return tags;
+  } else {
+    return Error("could not read file: ", file);
   }
-  console.log("worker finished, returning result: ", output.length);
-  return output;
 }
-// async function getProfileDescriptor(buffer) {
-
-// }

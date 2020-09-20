@@ -1,6 +1,10 @@
 <template>
   <div class="container row">
-    <h1>{{ path | folderName }}</h1>
+    <h4>{{ path | folderName }}</h4>
+    <p>totalImages: {{ totalImages }}</p>
+    <p>checkedImages: {{ checkedImages }}</p>
+    <p>convertedImages: {{ convertedImages }}</p>
+    <button @click="checkManually(path)">Check Manually</button>
   </div>
 </template>
 
@@ -9,13 +13,16 @@ import { ipcRenderer } from "electron";
 import config from "../../config";
 // eslint-disable-next-line no-unused-vars
 //import taskManager from "../../workers/taskManager.js";
+const fs = require("fs");
 const pathParse = require("path");
 const chokidar = require("chokidar");
 
 export default {
   data() {
     return {
-      filesAmount: undefined,
+      totalImages: null,
+      checkedImages: null,
+      convertedImages: null,
       fileList: []
     };
   },
@@ -38,14 +45,6 @@ export default {
       return true;
     },
     startFileWatcher(path) {
-      const list = this.fileList;
-      const id = pathParse.basename(path);
-
-      ipcRenderer.once(`${id}done`, (event, job) => {
-        console.log(job);
-        console.log(watcher.getWatched())
-      });
-
       const watcher = chokidar.watch(path, {
         ignored: /[/\\]\./,
         persistent: true,
@@ -56,22 +55,31 @@ export default {
       });
       watcher
         .on("add", file => {
-          console.log("added file ");
           if (this.isCheckPending(file)) {
+            this.totalImages++;
+            const fileName = pathParse.basename(file);
+            this.fileList.push(fileName);
+            //!!!TODO: detailed id hashing
+            const id = fileName;
+            ipcRenderer.once(`${id}done`, (event, job) => {
+              this.convertedImages++;
+              console.log(job);
+            });
             this.fileList.push(file);
-          }
-          if (this.getExt(file) == ".mrk") {
-            console.log("found mrk", file);
-            this.filesAmount = +pathParse.basename(file).match(/\d+/);
-          }
-          if (this.filesAmount && this.fileList.length == this.filesAmount) {
-            console.log("sending job to TM ", id)
-            ipcRenderer.send("startCheck", { list, id });
+            ipcRenderer.send("checkFile", { id, file });
+            this.checkedImages++;
           }
         })
         .on("error", err => {
           console.log(err);
         });
+      this.startFileWatcher.watcher = watcher;
+    },
+    async checkManually(dir) {
+      fs.readdir(dir, (err, files) => {
+        console.log(files);
+        console.log(this.startFileWatcher.watcher)
+      });
     }
   },
   created() {
