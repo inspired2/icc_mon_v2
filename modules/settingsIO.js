@@ -25,19 +25,12 @@ export default {
     }
     return true;
   },
-  // checkProfile(json) {
-  //   const path = profileDestinationPath;
-  //   const buffer = fs.readFileSync(path);
-  //   const iccDesc = this.getIccDesc(buffer);
-  //   if (iccDesc === json.outputProfile) return true;
-  //   return false;
-  // },
   writeSettingsFile(settings) {
     fs.writeFileSync(settingsFilePath, JSON.stringify(settings));
   },
   copySelectedFile(sourcePath) {
     const buffer = fs.readFileSync(sourcePath);
-    const newPath = profileDestinationPath + sourcePath.match(/[^\\/]+.icc\b/);
+    const newPath = profileDestinationPath + sourcePath.match(/[^\\/]+.icm\b/);
     if (!fs.existsSync(profileDestinationPath)) {
       fs.mkdirSync(profileDestinationPath);
     }

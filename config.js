@@ -2,6 +2,7 @@ export default {
   settingsFileName: "appSettings.json",
   settingsFilePath: "./",
   iccProfileDestination: "./profile/",
+  iccProfileExtensions: ["icm"],
   validators: {
     pathToDir: "path",
     outputProfile: "file",

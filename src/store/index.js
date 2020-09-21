@@ -25,7 +25,6 @@ export default new Vuex.Store({
   actions: {},
   getters: {
     settings(state) {
-      console.log("called getter, state: ", state.settings);
       return state.settings;
     }
   },

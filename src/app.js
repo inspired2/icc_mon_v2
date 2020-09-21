@@ -119,11 +119,11 @@ function decide(profile, file) {
   }
 }
 
-function converter(file) {
-  gm(file)
+function converter(filePath) {
+  gm(filePath)
     .profile("sRGB.icm")
     .intent("relative")
-    .write(file, err => {
+    .write(filePath, err => {
       counter.setConvertedImg();
       if (err) writeError(err);
     });

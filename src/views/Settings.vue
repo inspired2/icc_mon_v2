@@ -37,7 +37,7 @@
 <script>
 import IO from "../../modules/settingsIO";
 import { mapGetters, mapMutations } from "vuex";
-// import config from "./../../config";
+import config from "./../../config";
 const { dialog } = require("electron").remote;
 
 export default {
@@ -101,7 +101,7 @@ export default {
         filters: [
           {
             name: "файл профиля",
-            extensions: ["icc", "icm"]
+            extensions: config.iccProfileExtensions
           }
         ]
       });

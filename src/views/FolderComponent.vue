@@ -2,7 +2,6 @@
   <div class="container row">
     <h4>{{ path | folderName }}</h4>
     <p>totalImages: {{ totalImages }}</p>
-    <p>checkedImages: {{ checkedImages }}</p>
     <p>convertedImages: {{ convertedImages }}</p>
     <button @click="checkManually(path)">Check Manually</button>
   </div>
@@ -21,7 +20,6 @@ export default {
   data() {
     return {
       totalImages: null,
-      checkedImages: null,
       convertedImages: null,
       fileList: []
     };
@@ -45,11 +43,9 @@ export default {
         console.log(job);
       });
       ipcRenderer.send("checkFile", { id, file });
-      this.checkedImages++;
     },
     resetCounters() {
       this.totalImages = 0;
-      this.checkedImages = 0;
       this.convertedImages = 0;
       this.fileList = [];
     },
