@@ -2,7 +2,7 @@ const { parentPort } = require("worker_threads");
 const fs = require("fs");
 
 //const path = require("path");
-//const gm = require("gm");
+const gm = require("gm");
 const ExifReader = require("exifreader");
 
 parentPort.on("message", async job => {
@@ -21,4 +21,7 @@ async function checker(file) {
   } else {
     return Error("could not read file: ", file);
   }
+}
+async function converter(file) {
+
 }

@@ -13,7 +13,7 @@ import { ipcRenderer } from "electron";
 import config from "../../config";
 // eslint-disable-next-line no-unused-vars
 //import taskManager from "../../workers/taskManager.js";
-const fs = require("fs");
+const { readdir } = require("fs").promises;
 const pathParse = require("path");
 const chokidar = require("chokidar");
 
@@ -33,6 +33,26 @@ export default {
     }
   },
   methods: {
+    checkFile(filePath) {
+      const file = filePath;
+      this.totalImages++;
+      const fileName = pathParse.basename(file);
+      this.fileList.push(fileName);
+      //!!!TODO: detailed id hashing
+      const id = fileName;
+      ipcRenderer.once(`${id}done`, (event, job) => {
+        this.convertedImages++;
+        console.log(job);
+      });
+      ipcRenderer.send("checkFile", { id, file });
+      this.checkedImages++;
+    },
+    resetCounters() {
+      this.totalImages = 0;
+      this.checkedImages = 0;
+      this.convertedImages = 0;
+      this.fileList = [];
+    },
     getExt(path) {
       return pathParse.parse(path).ext.toLowerCase();
     },
@@ -56,18 +76,7 @@ export default {
       watcher
         .on("add", file => {
           if (this.isCheckPending(file)) {
-            this.totalImages++;
-            const fileName = pathParse.basename(file);
-            this.fileList.push(fileName);
-            //!!!TODO: detailed id hashing
-            const id = fileName;
-            ipcRenderer.once(`${id}done`, (event, job) => {
-              this.convertedImages++;
-              console.log(job);
-            });
-            this.fileList.push(file);
-            ipcRenderer.send("checkFile", { id, file });
-            this.checkedImages++;
+            this.checkFile(file);
           }
         })
         .on("error", err => {
@@ -76,12 +85,27 @@ export default {
       this.startFileWatcher.watcher = watcher;
     },
     async checkManually(dir) {
-      fs.readdir(dir, (err, files) => {
-        console.log(files);
-        console.log(this.startFileWatcher.watcher)
+      this.startFileWatcher.watcher.close();
+      this.resetCounters();
+      const files = await this.getFiles(dir);
+      files.forEach(file => {
+        if (this.isCheckPending(file)) {
+          this.checkFile(file);
+        }
       });
+    },
+    async getFiles(dir) {
+      const dirents = await readdir(dir, { withFileTypes: true });
+      const files = await Promise.all(
+        dirents.map(dirent => {
+          const res = pathParse.resolve(dir, dirent.name);
+          return dirent.isDirectory() ? this.getFiles(res) : res;
+        })
+      );
+      return Array.prototype.concat(...files);
     }
   },
+
   created() {
     if (config.autostartFileWatcher) {
       this.startFileWatcher(this.path);

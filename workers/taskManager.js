@@ -14,7 +14,7 @@ ipcMain.on("checkFile", (e, job) => {
 
 function responder(error, completeJob) {
   if (error) {
-    win.webContents.send(`${id}done`, "something went wrong in thread_worker");
+    win.webContents.send("error", "something went wrong in thread_worker");
   } else {
     const id = completeJob.id;
     win.webContents.send(`${id}done`, completeJob);

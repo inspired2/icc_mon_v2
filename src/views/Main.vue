@@ -42,16 +42,18 @@ export default {
         usePolling: true,
         persistent: false,
         awaitWriteFinish: true,
-        ignoreInitial: true,
+        ignoreInitial: false,
         ignorePermissionErrors: true
       });
       watcher
         .on("addDir", dir => {
-          console.log("dir added: ", dir);
-          this.addWatcherComponent(dir);
+          if (dir !== this.settings.pathToDir) {
+            console.log("dir added: ", dir);
+            this.addFolderComponent(dir);
+          }
         })
         .on("unlinkDir", dir => {
-          this.removeWatcherComponent(dir);
+          this.removeFolderComponent(dir);
           console.log("dir removed: ", dir);
         })
         .on("error", err => {
@@ -59,10 +61,10 @@ export default {
         });
       console.log(watcher);
     },
-    addWatcherComponent(id) {
+    addFolderComponent(id) {
       this.folders.push(id);
     },
-    removeWatcherComponent(id) {
+    removeFolderComponent(id) {
       const idx = this.folders.indexOf(id);
       this.folders.splice(idx, 1);
     }
