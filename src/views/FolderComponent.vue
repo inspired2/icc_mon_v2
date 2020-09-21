@@ -71,6 +71,7 @@ export default {
       });
       watcher
         .on("add", file => {
+          console.log("added file", file);
           if (this.isCheckPending(file)) {
             this.checkFile(file);
           }

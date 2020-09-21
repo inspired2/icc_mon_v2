@@ -42,7 +42,7 @@ export default {
         usePolling: true,
         persistent: false,
         awaitWriteFinish: true,
-        ignoreInitial: false,
+        ignoreInitial: true,
         ignorePermissionErrors: true
       });
       watcher
