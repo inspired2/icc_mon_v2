@@ -7,7 +7,7 @@ const WorkerPool = require("./WorkerPool");
 const os = require("os");
 const cpus = os.cpus().length;
 const settings = IO.readSettingsFile();
-const pool = new WorkerPool(Math.ceil(cpus / 2));
+const pool = new WorkerPool(cpus);
 let recieved = 0,
   sentBack = 0;
 

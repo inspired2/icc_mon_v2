@@ -22,7 +22,7 @@ parentPort.on("message", async job => {
       })
       .then(res => {
         //console.log("worker sending result", id);
-        parentPort.postMessage({ id, wrongProfile: res });
+        parentPort.postMessage({ id, file, wrongProfile: res });
       });
   } catch (e) {
     console.log(e);
@@ -35,7 +35,7 @@ async function getProfileDescriptor(file) {
     const tags = ExifReader.load(buffer, { expanded: true });
     if (tags.icc) {
       return tags.icc["ICC Description"].value;
-    } else return "unknown profile";
+    } else return { tags };
   } else {
     return Error("could not read file: ", file);
   }
@@ -45,7 +45,7 @@ async function convertProfile(file) {
     //console.log("gm writing file", file);
     gm(file)
       .profile(profilePath)
-      .intent("perceptual")
+      .intent("relative")
       .write(file, err => {
         if (!err) resolve("ok");
         else reject(err);

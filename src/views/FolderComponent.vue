@@ -2,8 +2,11 @@
   <div class="container row">
     <h4>{{ path | folderName }}</h4>
     <p>totalImages: {{ totalImages }}</p>
+    <p>checkedImages: {{ checkedImages }}</p>
     <p>convertedImages: {{ convertedImages }}</p>
-    <button @click="checkManually(path)">Check Manually</button>
+    <button @click="checkManually(path)" :active="taskFinished">
+      Check Manually
+    </button>
   </div>
 </template>
 
@@ -19,10 +22,19 @@ const chokidar = require("chokidar");
 export default {
   data() {
     return {
-      totalImages: null,
-      convertedImages: null,
+      convertedImages: 0,
+      checkedImages: 0,
       fileList: []
     };
+  },
+  computed: {
+    totalImages() {
+      return this.fileList.length;
+    },
+    taskFinished() {
+      const total = this.totalImages;
+      return total === this.checkedImages;
+    }
   },
   props: ["path"],
   filters: {
@@ -33,19 +45,21 @@ export default {
   methods: {
     checkFile(filePath) {
       const file = filePath;
-      this.totalImages++;
       const fileName = pathParse.basename(file);
       this.fileList.push(fileName);
-      //!!!TODO: detailed id hashing
+      //!!!TODO: detailed id hashing unique for every instance of component
       const id = fileName;
       ipcRenderer.once(`${id}done`, (event, job) => {
-        this.convertedImages++;
-        console.log(job);
+        this.checkedImages++;
+        if (job.wrongProfile) {
+          this.convertedImages++;
+          console.log(job);
+        }
       });
       ipcRenderer.send("checkFile", { id, file });
     },
     resetCounters() {
-      this.totalImages = 0;
+      this.checkedImages = 0;
       this.convertedImages = 0;
       this.fileList = [];
     },
@@ -65,13 +79,11 @@ export default {
         ignored: /[/\\]\./,
         persistent: true,
         awaitWriteFinish: true,
-        ignoreInitial: false,
         ignorePermissionErrors: true,
         usePolling: true
       });
       watcher
         .on("add", file => {
-          console.log("added file", file);
           if (this.isCheckPending(file)) {
             this.checkFile(file);
           }
