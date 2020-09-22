@@ -13,8 +13,7 @@
 <script>
 import { ipcRenderer } from "electron";
 import config from "../../config";
-// eslint-disable-next-line no-unused-vars
-//import taskManager from "../../workers/taskManager.js";
+import { CommonMethods } from "./mixins/CommonMethods";
 const { readdir } = require("fs").promises;
 const pathParse = require("path");
 const chokidar = require("chokidar");
@@ -36,7 +35,7 @@ export default {
       return total === this.checkedImages;
     }
   },
-  props: ["path"],
+  props: ["path", "folderId"],
   filters: {
     folderName(path) {
       return pathParse.basename(path);
@@ -47,8 +46,7 @@ export default {
       const file = filePath;
       const fileName = pathParse.basename(file);
       this.fileList.push(fileName);
-      //!!!TODO: detailed id hashing unique for every instance of component
-      const id = fileName;
+      const id = this.hashPath(fileName);
       ipcRenderer.once(`${id}done`, (event, job) => {
         this.checkedImages++;
         if (job.wrongProfile) {
@@ -114,7 +112,7 @@ export default {
       return Array.prototype.concat(...files);
     }
   },
-
+  mixins: [CommonMethods],
   created() {
     if (config.autostartFileWatcher) {
       this.startFileWatcher(this.path);

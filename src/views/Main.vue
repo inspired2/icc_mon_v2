@@ -3,12 +3,13 @@
     <h1>Main</h1>
     <div id="folders" class="row working-folders">
       <folder-component
-        :key="folder"
-        :path="folder"
+        :key="folder.id"
+        :path="folder.dirName"
+        :folderId="folder.id"
         class="worker"
         v-for="folder in folders"
       >
-        {{ folder }}
+        {{ folder.dirName }}
       </folder-component>
     </div>
   </div>
@@ -17,6 +18,7 @@
 <script>
 import { mapGetters } from "vuex";
 import FolderComponent from "../views/FolderComponent";
+import { CommonMethods } from "./mixins/CommonMethods";
 const chokidar = require("chokidar");
 const path = require("path");
 
@@ -42,7 +44,7 @@ export default {
         usePolling: true,
         persistent: false,
         awaitWriteFinish: true,
-        ignoreInitial: false,
+        ignoreInitial: true,
         ignorePermissionErrors: true
       });
       watcher
@@ -59,16 +61,20 @@ export default {
         .on("error", err => {
           console.log(err);
         });
-      console.log(watcher);
     },
-    addFolderComponent(id) {
-      this.folders.push(id);
+    addFolderComponent(dirName) {
+      const item = {
+        dirName,
+        id: this.hashPath(dirName)
+      };
+      this.folders.push(item);
     },
-    removeFolderComponent(id) {
-      const idx = this.folders.indexOf(id);
+    removeFolderComponent(dirName) {
+      const idx = this.folders.indexOf(dirName);
       this.folders.splice(idx, 1);
     }
   },
+  mixins: [CommonMethods],
   created() {
     this.startWatcher();
   }
