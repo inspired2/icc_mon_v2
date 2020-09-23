@@ -1,7 +1,11 @@
 <template>
   <div id="app" class="container">
+    <div class="row header">header</div>
     <div class="row main-container">
-      <h3>Convert images</h3>
+      <div @drop="run($event)" class="col-7 drop-container">
+        DropContainer
+      </div>
+      <div class="col-3 settings-container"></div>
     </div>
     <button @click="$router.push({ name: 'Home' })">Close</button>
   </div>
@@ -9,10 +13,21 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      dropElement: null
+    };
   },
-  methods: {}
+  methods: {
+    run() {
+      console.log("e")
+    }
+  },
+  created() {}
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+* {
+  border: 1px dotted red;
+}
+</style>
