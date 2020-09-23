@@ -3,7 +3,10 @@
     <div class="home-navbar row">
       <div class="col-4 current-folder">{{ settings.pathToDir }}</div>
       <div class="col-3 manual-convert">
-        <button class="btn btn-secondary">
+        <button
+          @click="$router.push({ name: 'Convert' })"
+          class="btn btn-secondary"
+        >
           converter
         </button>
       </div>

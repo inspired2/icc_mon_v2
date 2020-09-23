@@ -3,7 +3,7 @@
     <h1>Main</h1>
     <div id="folders" class="row working-folders">
       <folder-component
-        :key="folder.id"
+        :key="folder.dirName"
         :path="folder.dirName"
         :folderId="folder.id"
         class="worker"
@@ -57,6 +57,7 @@ export default {
         .on("unlinkDir", dir => {
           this.removeFolderComponent(dir);
           console.log("dir removed: ", dir);
+          console.log(this.folders);
         })
         .on("error", err => {
           console.log(err);
@@ -70,8 +71,17 @@ export default {
       this.folders.push(item);
     },
     removeFolderComponent(dirName) {
-      const idx = this.folders.indexOf(dirName);
-      this.folders.splice(idx, 1);
+      const id = this.hashPath(dirName);
+      const index = id => {
+        let index = -1;
+        this.folders.forEach((item, idx) => {
+          if (item.id === id) {
+            index = idx;
+          }
+        });
+        return index;
+      };
+      this.folders.splice(index(id), 1);
     }
   },
   mixins: [CommonMethods],

@@ -1,6 +1,5 @@
 const { parentPort } = require("worker_threads");
 const fs = require("fs");
-//const path = require("path");
 const gm = require("gm");
 const ExifReader = require("exifreader");
 
@@ -8,7 +7,6 @@ let profilePath, outputProfile;
 
 parentPort.on("message", async job => {
   try {
-    //console.log("worker recieved job", job.id);
     profilePath = job.pathToProfile;
     outputProfile = job.outputProfile;
     const { id, file } = job;
@@ -21,7 +19,6 @@ parentPort.on("message", async job => {
         return Promise.resolve(result);
       })
       .then(res => {
-        //console.log("worker sending result", id);
         parentPort.postMessage({ id, file, wrongProfile: res });
       });
   } catch (e) {
@@ -42,7 +39,6 @@ async function getProfileDescriptor(file) {
 }
 async function convertProfile(file) {
   return new Promise((resolve, reject) => {
-    //console.log("gm writing file", file);
     gm(file)
       .profile(profilePath)
       .intent("relative")
@@ -53,7 +49,6 @@ async function convertProfile(file) {
   });
 }
 function isConvertPending(profileDesc) {
-  //console.log(outputProfile);
   if (profileDesc == outputProfile) return false;
   else return profileDesc;
 }
