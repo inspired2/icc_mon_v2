@@ -14,7 +14,9 @@ ipcMain.on("checkFile", (e, job) => {
   job.outputProfile = settings.outputProfile;
   pool.runTask(job, responder);
 });
-
+ipcMain.on("convertFile", () => {
+  console.log("message from converter.vue");
+});
 function responder(error, completeJob) {
   if (error) {
     win.webContents.send("error", "something went wrong in thread_worker");

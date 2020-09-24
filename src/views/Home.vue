@@ -3,10 +3,7 @@
     <div class="home-navbar row">
       <div class="col-4 current-folder">{{ settings.pathToDir }}</div>
       <div class="col-3 manual-convert">
-        <button
-          @click="$router.push({ name: 'Convert' })"
-          class="btn btn-secondary"
-        >
+        <button @click="openConverterWin" class="btn btn-secondary">
           converter
         </button>
       </div>
@@ -21,14 +18,18 @@
     </div>
     <h1>APP</h1>
     <div class="row main-view">
-      <main-component></main-component>
+      <keep-alive>
+        <main-component></main-component>
+      </keep-alive>
     </div>
   </div>
 </template>
 
 <script>
+import { ipcRenderer } from "electron";
 import { mapGetters } from "vuex";
 import Main from "../views/Main";
+//import config from "../../config";
 
 export default {
   name: "Home",
@@ -39,7 +40,11 @@ export default {
     ...mapGetters(["settings"])
   },
   components: { "main-component": Main },
-  methods: {}
+  methods: {
+    openConverterWin() {
+      ipcRenderer.send("openConverterWin", { url: "converter" });
+    }
+  }
 };
 </script>
 

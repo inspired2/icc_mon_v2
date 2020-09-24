@@ -6,6 +6,7 @@ module.exports = {
     }
   },
   pages: {
-    index: "src/main.js" // your main window
+    index: "src/main.js",
+    converter: "src/converter.js" // your main window
   }
 };

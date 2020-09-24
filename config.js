@@ -10,5 +10,9 @@ export default {
     exceptionFolder: "path"
   },
   autostartFileWatcher: true,
-  iccConvertExt: [".jpg", ".jpeg", ".tiff", ".tif"]
+  iccConvertExt: [".jpg", ".jpeg", ".tiff", ".tif"],
+  converterWinConfig: {
+    width: 1200,
+    height: 700
+  }
 };

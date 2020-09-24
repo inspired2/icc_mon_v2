@@ -1,6 +1,6 @@
 "use strict";
 
-import { app, protocol, BrowserWindow } from "electron";
+import { app, protocol, BrowserWindow, ipcMain } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 // eslint-disable-next-line no-unused-vars
@@ -11,12 +11,49 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 export let win;
+let converterWin;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
 
+ipcMain.on("openConverterWin", (event, data) => {
+  // create the window
+  converterWin = new BrowserWindow(
+    Object.assign(
+      {
+        show: true,
+        parent: win,
+        modal: true,
+        webPreferences: {
+          nodeIntegration: true,
+          plugins: true
+        }
+      },
+      data.url
+    )
+  );
+
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    // Load the url of the dev server if in development mode
+    converterWin.loadURL(
+      process.env.WEBPACK_DEV_SERVER_URL + `${data.url}.html`
+    );
+    if (!process.env.IS_TEST) converterWin.webContents.openDevTools();
+  } else {
+    converterWin.loadURL(`app://./${data.url}.html`);
+  }
+
+  converterWin.on("closed", () => {
+    converterWin = null;
+  });
+
+  // here we can send the data to the new window
+  // settings.webContents.on("did-finish-load", () => {
+  //   settings.webContents.send("data", data);
+  // });
+});
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({

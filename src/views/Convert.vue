@@ -1,8 +1,8 @@
 <template>
-  <div id="app" class="container">
+  <div id="convert" class="container">
     <div class="row header">header</div>
     <div class="row main-container">
-      <div @drop="run($event)" class="col-7 drop-container">
+      <div @click="run()" class="col-7 drop-container">
         DropContainer
         <div
           @click="removePath(dir, 'dirs')"
@@ -20,10 +20,10 @@
         </button>
       </div>
     </div>
-    <button @click="$router.push({ name: 'Home' })">Close</button>
   </div>
 </template>
 <script>
+import { ipcRenderer } from "electron";
 const { dialog } = require("electron").remote;
 
 export default {
@@ -64,7 +64,7 @@ export default {
       if (index >= 0) prop.splice(index, 1);
     },
     run() {
-      console.log("e");
+      ipcRenderer.send("convertFile");
     }
   },
   created() {}
