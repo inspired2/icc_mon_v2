@@ -14,11 +14,6 @@ const routes = [
     path: "/settings",
     name: "Settings",
     component: () => import("../views/Settings.vue")
-  },
-  {
-    path: "/convert",
-    name: "Convert",
-    component: () => import("../views/Convert.vue")
   }
 ];
 

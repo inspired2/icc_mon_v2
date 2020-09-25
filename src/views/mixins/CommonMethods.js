@@ -1,3 +1,6 @@
+const { readdir } = require("fs").promises;
+const pathParse = require("path");
+
 export const CommonMethods = {
   methods: {
     hashPath(string) {
@@ -10,6 +13,16 @@ export const CommonMethods = {
         hash |= 0;
       }
       return hash.toString(10);
+    },
+    async getFiles(dir) {
+      const dirents = await readdir(dir, { withFileTypes: true });
+      const files = await Promise.all(
+        dirents.map(dirent => {
+          const res = pathParse.resolve(dir, dirent.name);
+          return dirent.isDirectory() ? this.getFiles(res) : res;
+        })
+      );
+      return Array.prototype.concat(...files);
     }
   }
 };

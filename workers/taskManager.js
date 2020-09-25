@@ -14,7 +14,7 @@ ipcMain.on("checkFile", (e, job) => {
   job.outputProfile = settings.outputProfile;
   pool.runTask(job, responder);
 });
-ipcMain.on("convertFile", () => {
+ipcMain.on("convertFiles", () => {
   console.log("message from converter.vue");
 });
 function responder(error, completeJob) {

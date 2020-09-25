@@ -2,7 +2,7 @@
   <div id="convert" class="container">
     <div class="row header">header</div>
     <div class="row main-container">
-      <div @click="run()" class="col-7 drop-container">
+      <div class="col-7 drop-container">
         DropContainer
         <div
           @click="removePath(dir, 'dirs')"
@@ -23,6 +23,7 @@
   </div>
 </template>
 <script>
+import CommonMethods from "./mixins/CommonMethods";
 import { ipcRenderer } from "electron";
 const { dialog } = require("electron").remote;
 
@@ -30,9 +31,11 @@ export default {
   data() {
     return {
       dropElement: null,
-      dirs: []
+      dirs: [],
+      files: []
     };
   },
+  mixins: [CommonMethods],
   watch: {},
   methods: {
     async startSelectDirDialog() {
@@ -54,14 +57,37 @@ export default {
       });
       return Promise.resolve(dirs);
     },
-    addPath(path, key) {
-      const prop = this[key];
+    addPath(path, destination) {
+      const prop = this[destination];
       prop.push(path);
     },
-    removePath(path, key) {
-      const prop = this[key];
+    removePath(path, destination) {
+      const prop = this[destination];
       const index = prop.indexOf(path);
       if (index >= 0) prop.splice(index, 1);
+    },
+    async parseSelected(fileList) {
+      console.log(fileList);
+    },
+    async testFiles(fileList) {
+      //!!! refactor id hashing
+      const id = this.hashPath(fileList[0]);
+      console.log(fileList);
+      ipcRenderer.once(`${id}tested`, res => {
+        //add response parsing logic
+        console.log("tested", res);
+      });
+      ipcRenderer.send("getFilesMeta", fileList);
+    },
+    async convertFiles(fileList) {
+      //!!!refactor id hashing
+      const id = this.hashPath(fileList[0]);
+      console.log(fileList);
+      ipcRenderer.once(`${id}converted`, res => {
+        //add response parsing logic
+        console.log(`converted `, res);
+      });
+      ipcRenderer.send("convertFiles", { id, fileList });
     },
     run() {
       ipcRenderer.send("convertFile");

@@ -14,7 +14,6 @@
 import { ipcRenderer } from "electron";
 import config from "../../config";
 import { CommonMethods } from "./mixins/CommonMethods";
-const { readdir } = require("fs").promises;
 const pathParse = require("path");
 const chokidar = require("chokidar");
 
@@ -100,16 +99,6 @@ export default {
           this.checkFile(file);
         }
       });
-    },
-    async getFiles(dir) {
-      const dirents = await readdir(dir, { withFileTypes: true });
-      const files = await Promise.all(
-        dirents.map(dirent => {
-          const res = pathParse.resolve(dir, dirent.name);
-          return dirent.isDirectory() ? this.getFiles(res) : res;
-        })
-      );
-      return Array.prototype.concat(...files);
     }
   },
   mixins: [CommonMethods],
