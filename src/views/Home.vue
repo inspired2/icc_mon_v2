@@ -18,9 +18,7 @@
     </div>
     <h1>APP</h1>
     <div class="row main-view">
-      <keep-alive>
-        <main-component></main-component>
-      </keep-alive>
+      <main-component></main-component>
     </div>
   </div>
 </template>

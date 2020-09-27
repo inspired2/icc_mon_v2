@@ -6,6 +6,15 @@ const ExifReader = require("exifreader");
 let profilePath, outputProfile;
 
 parentPort.on("message", async job => {
+  if (job.type === "convertType") {
+    await typeConvert(job.image).then(() => {
+      parentPort.postMessage("ok");
+    });
+  } else {
+    await processProfile(job);
+  }
+});
+async function processProfile(job) {
   try {
     profilePath = job.pathToProfile;
     outputProfile = job.outputProfile;
@@ -24,15 +33,21 @@ parentPort.on("message", async job => {
   } catch (e) {
     console.log(e);
   }
-});
-
+}
 async function getProfileDescriptor(file) {
   const buffer = fs.readFileSync(file);
   if (buffer) {
-    const tags = ExifReader.load(buffer, { expanded: true });
-    if (tags.icc) {
-      return tags.icc["ICC Description"].value;
-    } else return { tags };
+    let tags;
+    try {
+      tags = ExifReader.load(buffer, { expanded: true });
+      if (tags.icc) {
+        return tags.icc["ICC Description"].value;
+      } else return { tags };
+    } catch (e) {
+      console.log("error in exifreader", e);
+      tags = null;
+      return tags;
+    }
   } else {
     return Error("could not read file: ", file);
   }
@@ -52,3 +67,4 @@ function isConvertPending(profileDesc) {
   if (profileDesc == outputProfile) return false;
   else return profileDesc;
 }
+async function typeConvert(imagePath) {}

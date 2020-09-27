@@ -41,7 +41,7 @@ export default {
     }
   },
   methods: {
-    checkFile(filePath) {
+    checkImage(filePath) {
       const file = filePath;
       const fileName = pathParse.basename(file);
       this.fileList.push(fileName);
@@ -53,7 +53,7 @@ export default {
           console.log(job);
         }
       });
-      ipcRenderer.send("checkFile", { id, file });
+      ipcRenderer.send("checkImage", { id, file });
     },
     resetCounters() {
       this.checkedImages = 0;
@@ -82,7 +82,7 @@ export default {
       watcher
         .on("add", file => {
           if (this.isCheckPending(file)) {
-            this.checkFile(file);
+            this.checkImage(file);
           }
         })
         .on("error", err => {
@@ -96,7 +96,7 @@ export default {
       const files = await this.getFiles(dir);
       files.forEach(file => {
         if (this.isCheckPending(file)) {
-          this.checkFile(file);
+          this.checkImage(file);
         }
       });
     }

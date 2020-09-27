@@ -2,17 +2,15 @@
   <div id="main" class="container">
     <h1>Main</h1>
     <div id="folders" class="row working-folders">
-      <keep-alive>
-        <folder-component
-          :key="folder.dirName"
-          :path="folder.dirName"
-          :folderId="folder.id"
-          class="worker"
-          v-for="folder in folders"
-        >
-          {{ folder.dirName }}
-        </folder-component>
-      </keep-alive>
+      <folder-component
+        :key="folder.id"
+        :path="folder.dirName"
+        :folderId="folder.id"
+        class="worker"
+        v-for="folder in folders"
+      >
+        {{ folder.dirName }}
+      </folder-component>
     </div>
   </div>
 </template>

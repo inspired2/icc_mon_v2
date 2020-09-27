@@ -1,5 +1,5 @@
 <template>
-  <div id="convert" class="container">
+  <div id="converter" class="container">
     <div class="row header">header</div>
     <div class="row main-container">
       <div class="col-7 drop-container">
@@ -23,11 +23,12 @@
   </div>
 </template>
 <script>
-import CommonMethods from "./mixins/CommonMethods";
+import { CommonMethods } from "./mixins/CommonMethods";
 import { ipcRenderer } from "electron";
 const { dialog } = require("electron").remote;
 
 export default {
+  name: "Convert",
   data() {
     return {
       dropElement: null,
@@ -77,7 +78,7 @@ export default {
         //add response parsing logic
         console.log("tested", res);
       });
-      ipcRenderer.send("getFilesMeta", fileList);
+      ipcRenderer.send("getImagesMeta", { jobIsMeta: true, id, fileList });
     },
     async convertFiles(fileList) {
       //!!!refactor id hashing
@@ -87,10 +88,7 @@ export default {
         //add response parsing logic
         console.log(`converted `, res);
       });
-      ipcRenderer.send("convertFiles", { id, fileList });
-    },
-    run() {
-      ipcRenderer.send("convertFile");
+      ipcRenderer.send("batchConvertImages", { id, fileList });
     }
   },
   created() {}
