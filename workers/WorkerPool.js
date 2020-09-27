@@ -2,7 +2,6 @@ const { AsyncResource } = require("async_hooks");
 const { EventEmitter } = require("events");
 const path = require("path");
 const { Worker } = require("worker_threads");
-
 const kTaskInfo = Symbol("kTaskInfo");
 const kWorkerFreedEvent = Symbol("kWorkerFreedEvent");
 
@@ -24,7 +23,7 @@ class WorkerPool extends EventEmitter {
     this.numThreads = numThreads;
     this.workers = [];
     this.freeWorkers = [];
-
+    this.setMaxListeners(500);
     for (let i = 0; i < numThreads; i++) this.addNewWorker();
   }
 
@@ -63,6 +62,8 @@ class WorkerPool extends EventEmitter {
 
     const worker = this.freeWorkers.pop();
     worker[kTaskInfo] = new WorkerPoolTaskInfo(callback);
+    //console.log("workers: ", this.workers.length);
+    //console.log("free workers: ", this.freeWorkers.length);
     worker.postMessage(task);
   }
 
