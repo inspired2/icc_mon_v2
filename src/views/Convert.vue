@@ -78,7 +78,7 @@ export default {
         //add response parsing logic
         console.log("tested", res);
       });
-      ipcRenderer.send("getImagesMeta", { jobIsMeta: true, id, fileList });
+      ipcRenderer.send("getImagesMeta", { id, fileList });
     },
     async convertFiles(fileList) {
       //!!!refactor id hashing

@@ -2,22 +2,30 @@ const { parentPort } = require("worker_threads");
 const fs = require("fs");
 const gm = require("gm");
 const ExifReader = require("exifreader");
+const settings = require("../modules/settingsReader")();
+const { pathToProfile, outputProfile } = settings;
 
-let profilePath, outputProfile;
-
+// if (job.type === "batchConvert") {
+//   await typeConvert(job.image).then(() => {
+//     parentPort.postMessage("ok");
+//   });
+// } else {
+//   await processProfile(job);
+// }
 parentPort.on("message", async job => {
-  if (job.type === "convertType") {
-    await typeConvert(job.image).then(() => {
-      parentPort.postMessage("ok");
-    });
-  } else {
-    await processProfile(job);
+  switch (job.type) {
+    case "checkImage":
+      await processProfile(job);
+      break;
+    case "batchConvert":
+      await typeConvert(job);
+      break;
+    default:
+      break;
   }
 });
 async function processProfile(job) {
   try {
-    profilePath = job.pathToProfile;
-    outputProfile = job.outputProfile;
     const { id, file } = job;
     await getProfileDescriptor(file)
       .then(async descriptor => {
@@ -55,7 +63,7 @@ async function getProfileDescriptor(file) {
 async function convertProfile(file) {
   return new Promise((resolve, reject) => {
     gm(file)
-      .profile(profilePath)
+      .profile(pathToProfile)
       .intent("relative")
       .write(file, err => {
         if (!err) resolve("ok");

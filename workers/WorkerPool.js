@@ -23,7 +23,7 @@ class WorkerPool extends EventEmitter {
     this.numThreads = numThreads;
     this.workers = [];
     this.freeWorkers = [];
-    this.setMaxListeners(500);
+    this.setMaxListeners(5000);
     for (let i = 0; i < numThreads; i++) this.addNewWorker();
   }
 

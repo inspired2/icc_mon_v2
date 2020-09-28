@@ -39,6 +39,7 @@ import IO from "../../modules/settingsIO";
 import { mapGetters, mapMutations } from "vuex";
 import config from "./../../config";
 const { dialog } = require("electron").remote;
+import { ipcRenderer } from "electron";
 
 export default {
   name: "Settings",
@@ -81,6 +82,7 @@ export default {
       this.update({ field: "all", value: { ...this.localSettings } });
       IO.writeSettingsFile(this.localSettings);
       this.$router.push({ name: "Home" });
+      ipcRenderer.send("restartPool");
     },
     cancelChanges() {
       this.$router.push({ name: "Home" });
