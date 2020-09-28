@@ -8,6 +8,7 @@
 <script>
 import IO from "../modules/settingsIO.js";
 import { mapGetters, mapMutations } from "vuex";
+import readSettings from "../modules/settingsReader";
 
 export default {
   computed: {
@@ -19,7 +20,7 @@ export default {
       this.update({ field: "all", value: fileData });
     },
     checkSettings() {
-      const settings = IO.readSettingsFile();
+      const settings = readSettings();
       if (!settings) {
         IO.createSettingsFile(this.settings);
         this.$router.push({ name: "Settings" });

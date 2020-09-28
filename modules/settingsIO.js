@@ -6,16 +6,6 @@ const profileDestinationPath = config.iccProfileDestination;
 import { parse } from "icc";
 
 export default {
-  readSettingsFile() {
-    try {
-      const buffer = fs.readFileSync(settingsFilePath, "utf-8");
-      if (buffer) {
-        return JSON.parse(buffer);
-      } else return null;
-    } catch (e) {
-      return null;
-    }
-  },
   createSettingsFile(settings) {
     try {
       fs.writeFileSync(settingsFilePath, JSON.stringify(settings));

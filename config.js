@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   settingsFileName: "appSettings.json",
   settingsFilePath: "./",
   iccProfileDestination: "./profile/",
