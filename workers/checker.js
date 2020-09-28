@@ -5,43 +5,47 @@ const ExifReader = require("exifreader");
 const settings = require("../modules/settingsReader")();
 const { pathToProfile, outputProfile } = settings;
 
-// if (job.type === "batchConvert") {
-//   await typeConvert(job.image).then(() => {
-//     parentPort.postMessage("ok");
-//   });
-// } else {
-//   await processProfile(job);
-// }
+const methods = {
+  async checkImage(job) {
+    try {
+      const { id, file } = job;
+      await getProfileDescriptor(file)
+        .then(async descriptor => {
+          const result = isConvertPending(descriptor);
+          if (result) {
+            await convertProfile(file);
+          }
+          return Promise.resolve(result);
+        })
+        .then(res => {
+          parentPort.postMessage({ id, file, wrongProfile: res });
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  },
+  async batchConvert(job) {
+    const { image, options } = job;
+    const outputProfile = options.profilePath;
+    const fileFormat = options.imageType;
+    if(fileFormat === "heic" || fileFormat === "heif") {
+      convertHeif(image)
+    }
+  },
+  async getMeta(job) {
+    const { image } = job;
+    const tags = getProfileDescriptor(image);
+    tags.then(res => {
+      parentPort.postMessage({ image, icc: res });
+    });
+  }
+};
+
 parentPort.on("message", async job => {
-  switch (job.type) {
-    case "checkImage":
-      await processProfile(job);
-      break;
-    case "batchConvert":
-      await typeConvert(job);
-      break;
-    default:
-      break;
-  }
+  await methods[job.type](job);
 });
-async function processProfile(job) {
-  try {
-    const { id, file } = job;
-    await getProfileDescriptor(file)
-      .then(async descriptor => {
-        const result = isConvertPending(descriptor);
-        if (result) {
-          await convertProfile(file);
-        }
-        return Promise.resolve(result);
-      })
-      .then(res => {
-        parentPort.postMessage({ id, file, wrongProfile: res });
-      });
-  } catch (e) {
-    console.log(e);
-  }
-}
+
+// eslint-disable-next-line no-unused-vars
 async function getProfileDescriptor(file) {
   const buffer = fs.readFileSync(file);
   if (buffer) {
@@ -75,4 +79,3 @@ function isConvertPending(profileDesc) {
   if (profileDesc == outputProfile) return false;
   else return profileDesc;
 }
-async function typeConvert(imagePath) {}

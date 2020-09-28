@@ -33,7 +33,11 @@ export default {
     return {
       dropElement: null,
       dirs: [],
-      files: []
+      files: [],
+      convertOptions: {
+        profilePath: null,
+        imageType: null
+      }
     };
   },
   mixins: [CommonMethods],
@@ -78,17 +82,21 @@ export default {
         //add response parsing logic
         console.log("tested", res);
       });
-      ipcRenderer.send("getImagesMeta", { id, fileList });
+      ipcRenderer.send("getMeta", { id, fileList });
     },
     async convertFiles(fileList) {
       //!!!refactor id hashing
       const id = this.hashPath(fileList[0]);
       console.log(fileList);
-      ipcRenderer.once(`${id}converted`, res => {
+      ipcRenderer.once(`${id}batchConvert`, res => {
         //add response parsing logic
         console.log(`converted `, res);
       });
-      ipcRenderer.send("batchConvertImages", { id, fileList });
+      ipcRenderer.send("batchConvertImages", {
+        id,
+        fileList,
+        options: this.convertOptions
+      });
     }
   },
   created() {}
