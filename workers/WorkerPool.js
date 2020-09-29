@@ -26,7 +26,9 @@ class WorkerPool extends EventEmitter {
     this.setMaxListeners(5000);
     for (let i = 0; i < numThreads; i++) this.addNewWorker();
   }
-
+  isIdle() {
+    return this.workers.length === this.freeWorkers.length;
+  }
   addNewWorker() {
     const worker = new Worker(path.resolve(__dirname, "../workers/checker.js"));
     worker.on("message", result => {

@@ -1,5 +1,6 @@
 const { readdir } = require("fs").promises;
 const pathParse = require("path");
+import config from "../../../config";
 
 export const CommonMethods = {
   methods: {
@@ -13,6 +14,17 @@ export const CommonMethods = {
         hash |= 0;
       }
       return hash.toString(10);
+    },
+    getExt(path) {
+      return pathParse.parse(path).ext.toLowerCase();
+    },
+    isCheckPending(path) {
+      const ext = this.getExt(path);
+      const extensions = config.iccConvertExt;
+      if (extensions.indexOf(ext) === -1) {
+        return false;
+      }
+      return true;
     },
     async getFiles(dir) {
       const dirents = await readdir(dir, { withFileTypes: true });

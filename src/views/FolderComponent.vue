@@ -12,8 +12,8 @@
 
 <script>
 import { ipcRenderer } from "electron";
-import config from "../../config";
 import { CommonMethods } from "./mixins/CommonMethods";
+import config from "../../config";
 const pathParse = require("path");
 const chokidar = require("chokidar");
 
@@ -59,17 +59,6 @@ export default {
       this.checkedImages = 0;
       this.convertedImages = 0;
       this.fileList = [];
-    },
-    getExt(path) {
-      return pathParse.parse(path).ext.toLowerCase();
-    },
-    isCheckPending(path) {
-      const ext = this.getExt(path);
-      const extensions = config.iccConvertExt;
-      if (extensions.indexOf(ext) === -1) {
-        return false;
-      }
-      return true;
     },
     startFileWatcher(path) {
       const watcher = chokidar.watch(path, {

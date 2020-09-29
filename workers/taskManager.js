@@ -9,8 +9,7 @@ let pool = new WorkerPool(cpus);
 ipcMain.on("restartPool", () => {
   console.log("settings canged =>> rebuilding pool of workers");
   //!!!must make sure workers aren't busy
-  pool.close();
-  pool = new WorkerPool(cpus);
+  schedulePoolRestart();
 });
 
 ipcMain.on("checkImage", (e, job) => {
@@ -64,4 +63,15 @@ function responder(err, res) {
     const id = res.id;
     win.webContents.send(`${id}done`, res);
   }
+}
+function schedulePoolRestart() {
+  const loop = setInterval(() => {
+    if (pool.isIdle()) {
+      pool.close();
+      pool = null;
+      pool = new WorkerPool(cpus);
+      clearInterval(loop);
+      console.log("pool restarted");
+    } else console.log("pool is busy");
+  }, 500);
 }

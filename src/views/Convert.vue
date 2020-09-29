@@ -20,11 +20,17 @@
         </button>
       </div>
     </div>
+    <button @click="convertFiles(files)" class="start-convert">
+      convertFiles
+    </button>
   </div>
 </template>
 <script>
 import { CommonMethods } from "./mixins/CommonMethods";
 import { ipcRenderer } from "electron";
+//import config from "../../config";
+
+const settings = require("../../modules/settingsReader")();
 const { dialog } = require("electron").remote;
 
 export default {
@@ -35,8 +41,8 @@ export default {
       dirs: [],
       files: [],
       convertOptions: {
-        profilePath: null,
-        imageType: null
+        profilePath: settings.pathToProfile,
+        imageType: ".jpeg"
       }
     };
   },
@@ -84,10 +90,13 @@ export default {
       });
       ipcRenderer.send("getMeta", { id, fileList });
     },
-    async convertFiles(fileList) {
+    async convertFiles() {
+      console.log(this.dirs);
+      this.createFileList(this.dirs);
+      const fileList = [...this.files];
       //!!!refactor id hashing
-      const id = this.hashPath(fileList[0]);
       console.log(fileList);
+      const id = this.hashPath(fileList[0]);
       ipcRenderer.once(`${id}batchConvert`, res => {
         //add response parsing logic
         console.log(`converted `, res);
@@ -97,6 +106,8 @@ export default {
         fileList,
         options: this.convertOptions
       });
+    },
+    createFileList(dirsList) {
     }
   },
   created() {}
