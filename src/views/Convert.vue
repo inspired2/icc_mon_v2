@@ -20,7 +20,7 @@
         </button>
       </div>
     </div>
-    <button @click="convertFiles(files)" class="start-convert">
+    <button @click="confirmSelection" class="start-convert">
       convertFiles
     </button>
   </div>
@@ -49,6 +49,12 @@ export default {
   mixins: [CommonMethods],
   watch: {},
   methods: {
+    async confirmSelection() {
+      //read selected dirs; ==> fileList={ dir1: [], dir2: [], ...}
+      //filter fileList. Keep expected fileextensions;
+      //send fileList to TM for checking;
+      //on response - write detailed fileList & print on screen fileNames with details
+    },
     async startSelectDirDialog() {
       let selected = await this.getDirsList();
       if (selected.length) {
@@ -91,12 +97,6 @@ export default {
       ipcRenderer.send("getMeta", { id, fileList });
     },
     async convertFiles() {
-      console.log(this.dirs);
-      this.createFileList(this.dirs);
-      const fileList = [...this.files];
-      //!!!refactor id hashing
-      console.log(fileList);
-      const id = this.hashPath(fileList[0]);
       ipcRenderer.once(`${id}batchConvert`, res => {
         //add response parsing logic
         console.log(`converted `, res);
@@ -106,8 +106,6 @@ export default {
         fileList,
         options: this.convertOptions
       });
-    },
-    createFileList(dirsList) {
     }
   },
   created() {}
