@@ -55,16 +55,36 @@ export default {
   methods: {
     async confirmSelection(dirs) {
       this.files = [];
-      await dirs.forEach(async dir => {
-        let dirEntry = {};
-        const list = await this.getFiles(dir);
-        const files = list.filter(file =>
-          config.unsupportedImageTypes.includes(this.getExt(file))
-        );
-        dirEntry.files = [...files];
-        dirEntry.dir = dir;
-        this.files.push(dirEntry);
+      let promises = [];
+      dirs.forEach(dir => {
+        const promise = new Promise((resolve, reject) => {
+          const list = this.getFiles(dir);
+          list
+            .then(files => {
+              const filtered = files.filter(file =>
+                config.unsupportedImageTypes.includes(this.getExt(file))
+              );
+              let dirEntry = {};
+              dirEntry.files = [...filtered];
+              dirEntry.dir = dir;
+              resolve(dirEntry);
+            })
+            .catch(err => reject(err));
+        });
+        promises.push(promise);
       });
+      const files = await Promise.all(promises);
+      files.forEach(dirEntry => {
+        console.log(dirEntry.files);
+        const id = dirEntry.dir;
+        const fileList = dirEntry.files;
+
+        ipcRenderer.once(`${id}batchConvert`, res => {
+          console.log(res);
+        });
+        ipcRenderer.send("batchConvertImages", { id, fileList });
+      });
+
       //console.log(this.files);
       //read selected dirs; ==> fileList={ dir1: [], dir2: [], ...}
       //filter fileList. Keep expected fileextensions;

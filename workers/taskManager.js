@@ -29,15 +29,16 @@ function checkImage(job) {
   pool.runTask(job, responder);
 }
 
-function batchProcess(job, type) {
-  const { options } = job;
-
+function batchProcess(job, jobType) {
+  //console.log(job);
+  //const { options } = job;
   const completeJobs = [];
   const id = job.id;
   const fileList = job.fileList;
 
   fileList.forEach(image => {
-    const job = { image, type, options };
+    const job = { image, type: jobType };
+    console.log("TM sending job to worker: ", job);
     pool.runTask(job, batchResponder);
   });
 
@@ -48,7 +49,8 @@ function batchProcess(job, type) {
       completeJobs.push(res);
     }
     if (completeJobs.length === fileList.length) {
-      converterWin.wibContents.send(`${id + type}`, completeJobs);
+      console.log("TM sending back to vue: ", completeJobs);
+      converterWin.webContents.send(`${id + jobType}`, completeJobs);
     }
   }
 }

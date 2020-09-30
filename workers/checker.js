@@ -24,10 +24,11 @@ const methods = {
   },
   async batchConvert(job) {
     const { image, options } = job;
-    const { profilePath, imageType } = options;
-    if (imageType === ".heic" || imageType === ".heif") {
-      return await convertHeic(image, profilePath);
-    }
+    console.log("starting converter");
+    //const { profilePath, imageType } = options;
+    //if (imageType === ".heic" || imageType === ".heif") {
+    return await convertHeic(image);
+    //}
   },
   async getMeta(job) {
     const { image } = job;
@@ -39,21 +40,26 @@ const methods = {
 };
 
 parentPort.on("message", async job => {
-  await methods[job.type](job).then(res => parentPort.postMessage(res));
+  console.log("worker recieved job: ", job);
+  await methods[job.type](job).then(res => {
+    console.log("worker complete job, sending res to TM:", res);
+    parentPort.postMessage(res);
+  });
 });
 
-async function convertHeic(imagePath, format) {
+async function convertHeic(imagePath, format = "JPEG") {
   try {
     const parsedPath = path.parse(imagePath);
-    const outputPath = parsedPath.dir + parsedPath.name + format;
+    const outputPath = parsedPath.dir + parsedPath.name + ".jpg";
     const buffer = fs.readFileSync(imagePath);
     const output = heicConverter({ buffer, format });
     await output.then(outputBuffer => {
-      fs.writeFileSync(outputBuffer, outputPath);
+      fs.writeFileSync(outputPath, outputBuffer);
     });
+    console.log("converter working")
     return { image: imagePath, result: "ok" };
   } catch (e) {
-    if (e) return { image: imagePath, result: e };
+    if (e) return { image: imagePath, result: "error" };
   }
 }
 // eslint-disable-next-line no-unused-vars
