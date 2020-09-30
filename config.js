@@ -14,5 +14,6 @@ module.exports = {
   converterWinConfig: {
     width: 1200,
     height: 700
-  }
+  },
+  unsupportedImageTypes: [".webp", ".heic"]
 };

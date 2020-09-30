@@ -20,15 +20,19 @@
         </button>
       </div>
     </div>
-    <button @click="confirmSelection" class="start-convert">
-      convertFiles
+    <button
+      v-if="dirs.length"
+      @click="confirmSelection(dirs)"
+      class="start-convert"
+    >
+      select
     </button>
   </div>
 </template>
 <script>
 import { CommonMethods } from "./mixins/CommonMethods";
 import { ipcRenderer } from "electron";
-//import config from "../../config";
+import config from "../../config";
 
 const settings = require("../../modules/settingsReader")();
 const { dialog } = require("electron").remote;
@@ -39,7 +43,7 @@ export default {
     return {
       dropElement: null,
       dirs: [],
-      files: [],
+      files: null,
       convertOptions: {
         profilePath: settings.pathToProfile,
         imageType: ".jpeg"
@@ -49,12 +53,25 @@ export default {
   mixins: [CommonMethods],
   watch: {},
   methods: {
-    async confirmSelection() {
+    async confirmSelection(dirs) {
+      this.files = [];
+      await dirs.forEach(async dir => {
+        let dirEntry = {};
+        const list = await this.getFiles(dir);
+        const files = list.filter(file =>
+          config.unsupportedImageTypes.includes(this.getExt(file))
+        );
+        dirEntry.files = [...files];
+        dirEntry.dir = dir;
+        this.files.push(dirEntry);
+      });
+      //console.log(this.files);
       //read selected dirs; ==> fileList={ dir1: [], dir2: [], ...}
       //filter fileList. Keep expected fileextensions;
       //send fileList to TM for checking;
       //on response - write detailed fileList & print on screen fileNames with details
     },
+
     async startSelectDirDialog() {
       let selected = await this.getDirsList();
       if (selected.length) {
@@ -95,18 +112,18 @@ export default {
         console.log("tested", res);
       });
       ipcRenderer.send("getMeta", { id, fileList });
-    },
-    async convertFiles() {
-      ipcRenderer.once(`${id}batchConvert`, res => {
-        //add response parsing logic
-        console.log(`converted `, res);
-      });
-      ipcRenderer.send("batchConvertImages", {
-        id,
-        fileList,
-        options: this.convertOptions
-      });
     }
+    // async convertFiles() {
+    //   ipcRenderer.once(`${id}batchConvert`, res => {
+    //     //add response parsing logic
+    //     console.log(`converted `, res);
+    //   });
+    //   ipcRenderer.send("batchConvertImages", {
+    //     id,
+    //     fileList,
+    //     options: this.convertOptions
+    //   });
+    // }
   },
   created() {}
 };
