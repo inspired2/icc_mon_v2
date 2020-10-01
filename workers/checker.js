@@ -6,6 +6,8 @@ const ExifReader = require("exifreader");
 const settings = require("../modules/settingsReader")();
 const { pathToProfile, outputProfile } = settings;
 const heicConverter = require("heic-convert");
+const webpConverter = require("webp-converter");
+webpConverter.grant_permission();
 
 const methods = {
   async checkImage(job) {
@@ -23,12 +25,18 @@ const methods = {
     }
   },
   async batchConvert(job) {
-    const { image, options } = job;
     console.log("starting converter");
+    const { image } = job;
+    const imageType = path.parse(image).ext.toLowerCase();
     //const { profilePath, imageType } = options;
-    //if (imageType === ".heic" || imageType === ".heif") {
-    return await convertHeic(image);
-    //}
+    if (imageType === ".heic" || imageType === ".heif") {
+      return await convertHeic(image);
+    }
+    if (imageType === ".webp") {
+      console.log("webp");
+      return await convertWebp(image);
+    }
+    return { image, result: "error => not supported image type" };
   },
   async getMeta(job) {
     const { image } = job;
@@ -56,7 +64,18 @@ async function convertHeic(imagePath, format = "JPEG") {
     await output.then(outputBuffer => {
       fs.writeFileSync(outputPath, outputBuffer);
     });
-    console.log("converter working")
+    console.log("converter working");
+    return { image: imagePath, result: "ok" };
+  } catch (e) {
+    if (e) return { image: imagePath, result: "error" };
+  }
+}
+async function convertWebp(imagePath) {
+  try {
+    const parsedPath = path.parse(imagePath);
+    const outputPath = parsedPath.name + ".jpg";
+    await webpConverter.dwebp(imagePath, outputPath, "-o");
+    console.log("webp converter working");
     return { image: imagePath, result: "ok" };
   } catch (e) {
     if (e) return { image: imagePath, result: "error" };
@@ -96,3 +115,4 @@ function isConvertPending(profileDesc) {
   if (profileDesc == outputProfile) return false;
   else return profileDesc;
 }
+ 

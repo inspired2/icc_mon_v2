@@ -84,8 +84,6 @@ export default {
         });
         ipcRenderer.send("batchConvertImages", { id, fileList });
       });
-
-      //console.log(this.files);
       //read selected dirs; ==> fileList={ dir1: [], dir2: [], ...}
       //filter fileList. Keep expected fileextensions;
       //send fileList to TM for checking;
