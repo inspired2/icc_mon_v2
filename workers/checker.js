@@ -8,6 +8,7 @@ const { pathToProfile, outputProfile } = settings;
 const heicConverter = require("heic-convert");
 const webpConverter = require("webp-converter");
 webpConverter.grant_permission();
+const sharp = require("sharp");
 
 const methods = {
   async checkImage(job) {
@@ -27,16 +28,16 @@ const methods = {
   async batchConvert(job) {
     console.log("starting converter");
     const { image } = job;
-    const imageType = path.parse(image).ext.toLowerCase();
-    //const { profilePath, imageType } = options;
-    if (imageType === ".heic" || imageType === ".heif") {
-      return await convertHeic(image);
-    }
-    if (imageType === ".webp") {
-      console.log("webp");
-      return await convertWebp(image);
-    }
-    return { image, result: "error => not supported image type" };
+    //const imageType = path.parse(image).ext.toLowerCase();
+    return await sharpConvert(image);
+    // if (imageType === ".heic" || imageType === ".heif") {
+    //   return await convertHeic(image);
+    // }
+    // if (imageType === ".webp") {
+    //   console.log("webp");
+    //   return await convertWebp(image);
+    // }
+    // return { image, result: "error => not supported image type" };
   },
   async getMeta(job) {
     const { image } = job;
@@ -46,6 +47,22 @@ const methods = {
     });
   }
 };
+async function sharpConvert(imagePath) {
+  const parsedPath = path.parse(imagePath);
+  const outputPath = parsedPath.dir + parsedPath.name + ".jpg";
+  try {
+    await sharp(imagePath)
+      .jpeg({
+        quality: 100
+      })
+      .withMetadata({ icc: "/home/alex/Загрузки/sRGB.icm" })
+      .toFile(outputPath);
+    return { image: imagePath, result: "ok" };
+  } catch (e) {
+    console.log(e);
+    return { image: imagePath, result: "error => not supported image type" };
+  }
+}
 
 parentPort.on("message", async job => {
   console.log("worker recieved job: ", job);
@@ -67,7 +84,10 @@ async function convertHeic(imagePath, format = "JPEG") {
     console.log("converter working");
     return { image: imagePath, result: "ok" };
   } catch (e) {
-    if (e) return { image: imagePath, result: "error" };
+    if (e) {
+      console.log(e);
+      return { image: imagePath, result: "error" };
+    }
   }
 }
 async function convertWebp(imagePath) {
@@ -115,4 +135,3 @@ function isConvertPending(profileDesc) {
   if (profileDesc == outputProfile) return false;
   else return profileDesc;
 }
- 

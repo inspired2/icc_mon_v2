@@ -15,5 +15,5 @@ module.exports = {
     width: 1200,
     height: 700
   },
-  unsupportedImageTypes: [".webp", ".heic"]
+  unsupportedImageTypes: [".webp", ".heic", ".heif"]
 };

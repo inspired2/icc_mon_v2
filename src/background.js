@@ -5,7 +5,7 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 // eslint-disable-next-line no-unused-vars
 import taskManager from "../workers/taskManager";
-//export const sharp = require("sharp");
+//export const sharp = import("sharp");
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
