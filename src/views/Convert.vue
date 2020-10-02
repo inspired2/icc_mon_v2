@@ -2,7 +2,12 @@
   <div id="converter" class="container">
     <div class="row header">header</div>
     <div class="row main-container">
-      <div class="col-7 drop-container">
+      <div
+        @dragover.prevent
+        @dragenter.prevent
+        @drop="processDrop($event)"
+        class="col-7 drop-container"
+      >
         DropContainer
         <div
           @click="removePath(dir, 'dirs')"
@@ -33,6 +38,7 @@
 import { CommonMethods } from "./mixins/CommonMethods";
 import { ipcRenderer } from "electron";
 import config from "../../config";
+const fs = require("fs");
 
 const settings = require("../../modules/settingsReader")();
 const { dialog } = require("electron").remote;
@@ -43,7 +49,7 @@ export default {
     return {
       dropElement: null,
       dirs: [],
-      files: null,
+      files: [],
       convertOptions: {
         profilePath: settings.pathToProfile,
         imageType: ".jpeg"
@@ -53,6 +59,20 @@ export default {
   mixins: [CommonMethods],
   watch: {},
   methods: {
+    processDrop(e) {
+      const dropList = e.dataTransfer.files;
+      const paths = this.arrayFrom(dropList);
+      if (!paths.length) return;
+      this.addPaths(paths);
+    },
+    arrayFrom(dropList) {
+      const array = [];
+      const key = "path";
+      for (let entry of Object.values(dropList)) {
+        array.push(entry[key]);
+      }
+      return array;
+    },
     async confirmSelection(dirs) {
       this.files = [];
       let promises = [];
@@ -89,14 +109,10 @@ export default {
       //send fileList to TM for checking;
       //on response - write detailed fileList & print on screen fileNames with details
     },
-
     async startSelectDirDialog() {
       let selected = await this.getDirsList();
       if (selected.length) {
-        const dirs = selected.filter(dir => !this.dirs.includes(dir));
-        dirs.forEach(path => {
-          this.addPath(path, "dirs");
-        });
+        this.addPaths(selected);
       }
     },
     async getDirsList() {
@@ -109,9 +125,23 @@ export default {
       });
       return Promise.resolve(dirs);
     },
-    addPath(path, destination) {
-      const prop = this[destination];
-      prop.push(path);
+    addPaths(arrayOfPaths) {
+      const paths = arrayOfPaths.filter(path => {
+        return !this.dirs.includes(path) && !this.files.includes(path);
+      });
+      const fileList = paths.filter(path => {
+        return !fs.lstatSync(path).isDirectory();
+      });
+      if (fileList.length) {
+        this.files = [...this.files, ...fileList];
+      }
+      const dirList = paths.filter(path => {
+        return !fileList.includes(path);
+      });
+      if (dirList.length) {
+        this.dirs = [...this.dirs, ...dirList];
+      }
+      console.dir({ dirs: this.dirs, files: this.files });
     },
     removePath(path, destination) {
       const prop = this[destination];

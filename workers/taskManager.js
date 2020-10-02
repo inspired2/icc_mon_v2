@@ -5,11 +5,10 @@ const WorkerPool = require("./WorkerPool");
 const os = require("os");
 const cpus = os.cpus().length;
 let pool = new WorkerPool(cpus);
-pool.registerSharp();
 
 ipcMain.on("restartPool", () => {
   console.log("settings canged =>> rebuilding pool of workers");
-  //!!!must make sure workers aren't busy
+  //must make sure workers aren't busy
   schedulePoolRestart();
 });
 
@@ -31,8 +30,6 @@ function checkImage(job) {
 }
 
 function batchProcess(job, jobType) {
-  //console.log(job);
-  //const { options } = job;
   const completeJobs = [];
   const id = job.id;
   const fileList = job.fileList;
@@ -55,6 +52,7 @@ function batchProcess(job, jobType) {
     }
   }
 }
+
 function responder(err, res) {
   if (res.type == "getMetadata") {
     const id = res.id;
