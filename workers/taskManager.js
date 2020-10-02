@@ -5,6 +5,7 @@ const WorkerPool = require("./WorkerPool");
 const os = require("os");
 const cpus = os.cpus().length;
 let pool = new WorkerPool(cpus);
+pool.registerSharp();
 
 ipcMain.on("restartPool", () => {
   console.log("settings canged =>> rebuilding pool of workers");

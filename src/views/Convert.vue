@@ -79,7 +79,7 @@ export default {
         const id = dirEntry.dir;
         const fileList = dirEntry.files;
 
-        ipcRenderer.once(`${id}batchConvert`, res => {
+        ipcRenderer.once(`${id}batchConvert`, (event, res) => {
           console.log(res);
         });
         ipcRenderer.send("batchConvertImages", { id, fileList });

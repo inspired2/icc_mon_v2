@@ -5,9 +5,6 @@ const gm = require("gm");
 const ExifReader = require("exifreader");
 const settings = require("../modules/settingsReader")();
 const { pathToProfile, outputProfile } = settings;
-const heicConverter = require("heic-convert");
-const webpConverter = require("webp-converter");
-webpConverter.grant_permission();
 const sharp = require("sharp");
 
 const methods = {
@@ -30,14 +27,6 @@ const methods = {
     const { image } = job;
     //const imageType = path.parse(image).ext.toLowerCase();
     return await sharpConvert(image);
-    // if (imageType === ".heic" || imageType === ".heif") {
-    //   return await convertHeic(image);
-    // }
-    // if (imageType === ".webp") {
-    //   console.log("webp");
-    //   return await convertWebp(image);
-    // }
-    // return { image, result: "error => not supported image type" };
   },
   async getMeta(job) {
     const { image } = job;
@@ -49,18 +38,21 @@ const methods = {
 };
 async function sharpConvert(imagePath) {
   const parsedPath = path.parse(imagePath);
-  const outputPath = parsedPath.dir + parsedPath.name + ".jpg";
+  const outputPath =
+    path.join(parsedPath.dir, parsedPath.name + parsedPath.ext.substring(1)) +
+    ".jpg";
   try {
+    console.log(outputPath);
     await sharp(imagePath)
       .jpeg({
         quality: 100
       })
-      .withMetadata({ icc: "/home/alex/Загрузки/sRGB.icm" })
+      .withMetadata({ icc: pathToProfile })
       .toFile(outputPath);
     return { image: imagePath, result: "ok" };
   } catch (e) {
     console.log(e);
-    return { image: imagePath, result: "error => not supported image type" };
+    return { image: imagePath, result: "error: ", e };
   }
 }
 
@@ -72,36 +64,6 @@ parentPort.on("message", async job => {
   });
 });
 
-async function convertHeic(imagePath, format = "JPEG") {
-  try {
-    const parsedPath = path.parse(imagePath);
-    const outputPath = parsedPath.dir + parsedPath.name + ".jpg";
-    const buffer = fs.readFileSync(imagePath);
-    const output = heicConverter({ buffer, format });
-    await output.then(outputBuffer => {
-      fs.writeFileSync(outputPath, outputBuffer);
-    });
-    console.log("converter working");
-    return { image: imagePath, result: "ok" };
-  } catch (e) {
-    if (e) {
-      console.log(e);
-      return { image: imagePath, result: "error" };
-    }
-  }
-}
-async function convertWebp(imagePath) {
-  try {
-    const parsedPath = path.parse(imagePath);
-    const outputPath = parsedPath.name + ".jpg";
-    await webpConverter.dwebp(imagePath, outputPath, "-o");
-    console.log("webp converter working");
-    return { image: imagePath, result: "ok" };
-  } catch (e) {
-    if (e) return { image: imagePath, result: "error" };
-  }
-}
-// eslint-disable-next-line no-unused-vars
 async function getProfileDescriptor(file) {
   const buffer = fs.readFileSync(file);
   if (buffer) {
