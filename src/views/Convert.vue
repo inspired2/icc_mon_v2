@@ -47,7 +47,6 @@ export default {
   name: "Convert",
   data() {
     return {
-      dropElement: null,
       dirs: [],
       files: [],
       convertOptions: {
@@ -59,7 +58,12 @@ export default {
   mixins: [CommonMethods],
   watch: {},
   methods: {
+    resetLocalState() {
+      this.dirs = [];
+      this.files = [];
+    },
     processDrop(e) {
+      this.resetLocalState();
       const dropList = e.dataTransfer.files;
       const paths = this.arrayFrom(dropList);
       if (!paths.length) return;
