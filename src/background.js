@@ -103,7 +103,7 @@ app.on("activate", () => {
   // dock icon is clicked and there are no other windows open.
   if (win === null) {
     createWindow();
-  }exit
+  }
 });
 
 // This method will be called when Electron has finished

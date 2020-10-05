@@ -51,7 +51,7 @@ export default {
           }
         }
       }
-      console.log(isValid);
+      console.log("settings valid: ", isValid);
       if (!isValid) {
         this.$router.push({ name: "Settings" });
       }
