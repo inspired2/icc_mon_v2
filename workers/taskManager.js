@@ -5,11 +5,9 @@ const WorkerPool = require("./WorkerPool");
 const os = require("os");
 const cpus = os.cpus().length;
 let pool = new WorkerPool(cpus);
-
-ipcMain.on("restartPool", () => {
-  console.log("settings canged =>> rebuilding pool of workers");
-  //must make sure workers aren't busy
-  schedulePoolRestart();
+ipcMain.on("reloadApp", () => {
+  pool.close();
+  ipcMain.emit("startReload");
 });
 
 ipcMain.on("checkImage", (e, job) => {
@@ -54,25 +52,14 @@ function batchProcess(job, jobType) {
 }
 
 function responder(err, res) {
-  if (res.type == "getMetadata") {
-    const id = res.id;
-    converterWin.webContents.send(`${id}done`, res);
-  }
+  // if (res.type == "getMetadata") {
+  //   const id = res.id;
+  //   converterWin.webContents.send(`${id}done`, res);
+  // }
   if (err) {
     win.webContents.send("error", "something went wrong in thread_worker");
   } else {
     const id = res.id;
     win.webContents.send(`${id}done`, res);
   }
-}
-function schedulePoolRestart() {
-  const loop = setInterval(() => {
-    if (pool.isIdle()) {
-      pool.close();
-      pool = null;
-      pool = new WorkerPool(cpus);
-      clearInterval(loop);
-      console.log("pool restarted");
-    } else console.log("pool is busy");
-  }, 500);
 }

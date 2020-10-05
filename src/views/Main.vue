@@ -1,6 +1,7 @@
 <template>
   <div id="main" class="container">
     <h1>Main</h1>
+    <button @click="scanForFolders" class="scan-manually">Scan</button>
     <div id="folders" class="row working-folders">
       <folder-component
         :key="folder.id"
@@ -16,6 +17,7 @@
 </template>
 
 <script>
+import { readdirSync } from "fs";
 import { mapGetters } from "vuex";
 import FolderComponent from "../views/FolderComponent";
 import { CommonMethods } from "./mixins/CommonMethods";
@@ -44,7 +46,7 @@ export default {
         usePolling: true,
         persistent: false,
         awaitWriteFinish: true,
-        ignoreInitial: false,
+        ignoreInitial: true,
         ignorePermissionErrors: true
       });
       watcher
@@ -68,7 +70,25 @@ export default {
         dirName,
         id: this.hashPath(dirName)
       };
-      this.folders.push(item);
+      if (this.folderIsNew(item.dirName)) this.folders.unshift(item);
+    },
+    folderIsNew(dirName) {
+      let flag = true;
+      this.folders.forEach(item => {
+        if (item.dirName === dirName) flag = false;
+      });
+      return flag;
+    },
+    scanForFolders() {
+      const dirToWatch = path.normalize(this.settings.pathToDir);
+      const dirents = readdirSync(dirToWatch, { withFileTypes: true });
+      const folders = dirents.map(dirent => {
+        const folder = path.resolve(dirToWatch, dirent.name);
+        if (!this.folders.includes(folder)) return folder;
+      });
+      folders.forEach(folder => {
+        this.addFolderComponent(folder);
+      });
     },
     removeFolderComponent(dirName) {
       const id = this.hashPath(dirName);

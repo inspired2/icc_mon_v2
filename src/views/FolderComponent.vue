@@ -91,7 +91,7 @@ export default {
     }
   },
   mixins: [CommonMethods],
-  created() {
+  beforeMount() {
     if (config.autostartFileWatcher) {
       this.startFileWatcher(this.path);
     }

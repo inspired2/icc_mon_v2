@@ -82,7 +82,7 @@ export default {
       this.update({ field: "all", value: { ...this.localSettings } });
       IO.writeSettingsFile(this.localSettings);
       this.$router.push({ name: "Home" });
-      ipcRenderer.send("restartPool");
+      ipcRenderer.send("reloadApp");
     },
     cancelChanges() {
       this.$router.push({ name: "Home" });

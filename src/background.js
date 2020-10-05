@@ -18,7 +18,10 @@ export let converterWin;
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
-
+ipcMain.on("startReload", () => {
+  console.log("settings canged =>> restarting app");
+  reloadApp();
+});
 ipcMain.on("openConverterWin", (event, data) => {
   // create the window
   converterWin = new BrowserWindow(
@@ -55,6 +58,10 @@ ipcMain.on("openConverterWin", (event, data) => {
   //   settings.webContents.send("data", data);
   // });
 });
+function reloadApp() {
+  app.relaunch();
+  app.quit();
+}
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
@@ -96,7 +103,7 @@ app.on("activate", () => {
   // dock icon is clicked and there are no other windows open.
   if (win === null) {
     createWindow();
-  }
+  }exit
 });
 
 // This method will be called when Electron has finished

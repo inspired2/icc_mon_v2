@@ -5,7 +5,7 @@
       <div
         @dragover.prevent
         @dragenter.prevent
-        @drop="processDrop($event)"
+        @drop.stop.prevent="processDrop($event)"
         class="col-7 drop-container"
       >
         DropContainer
@@ -63,7 +63,7 @@ export default {
       this.files = [];
     },
     processDrop(e) {
-      this.resetLocalState();
+      //this.resetLocalState();
       const dropList = e.dataTransfer.files;
       const paths = this.arrayFrom(dropList);
       if (!paths.length) return;
