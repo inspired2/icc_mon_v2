@@ -5,6 +5,7 @@ const WorkerPool = require("./WorkerPool");
 const os = require("os");
 const cpus = os.cpus().length;
 let pool = new WorkerPool(cpus);
+
 ipcMain.on("reloadApp", () => {
   pool.close();
   ipcMain.emit("startReload");
