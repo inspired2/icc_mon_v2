@@ -13,6 +13,14 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 // be closed automatically when the JavaScript object is garbage collected.
 export let win;
 export let converterWin;
+const windows = [];
+function identifyWinInstance(eventObj) {
+  for (let i = 0; i < windows.length; i++) {
+    if (windows[i].webContents === eventObj.sender) {
+      return windows[i];
+    }
+  }
+}
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -24,14 +32,12 @@ ipcMain.on("startReload", () => {
 });
 
 ipcMain.on("openDialog", async (event, data) => {
-  const path = dialog.showOpenDialog(win, data);
-  await path.then(e => {
-    console.log(e.filePaths[0]);
-    if (e.filePaths[0]) {
-      win.webContents.send("path", e.filePaths[0]);
-    }
-  });
+  const sender = identifyWinInstance(event);
+  console.log(sender);
+  const path = dialog.showOpenDialog(sender, data);
+  await path.then(e => event.sender.send("pathBrowsed", e.filePaths[0]));
 });
+
 ipcMain.on("openConverterWin", (event, data) => {
   // create the window
   converterWin = new BrowserWindow(
@@ -48,7 +54,7 @@ ipcMain.on("openConverterWin", (event, data) => {
       data.url
     )
   );
-
+  windows.push(converterWin);
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     converterWin.loadURL(
@@ -60,6 +66,7 @@ ipcMain.on("openConverterWin", (event, data) => {
   }
 
   converterWin.on("closed", () => {
+    windows.splice(windows.indexOf(converterWin), 1);
     converterWin = null;
   });
 
@@ -84,7 +91,7 @@ function createWindow() {
       nodeIntegrationInWorker: true
     }
   });
-
+  windows.push(win);
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);

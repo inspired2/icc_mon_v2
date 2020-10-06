@@ -38,7 +38,6 @@
 import IO from "../../modules/settingsIO";
 import { mapGetters, mapMutations } from "vuex";
 import config from "./../../config";
-const { dialog } = require("electron").remote;
 import { ipcRenderer } from "electron";
 
 export default {
@@ -87,34 +86,28 @@ export default {
     cancelChanges() {
       this.$router.push({ name: "Home" });
     },
+    addIpcListener(eventName, callback) {
+      ipcRenderer.once(eventName, callback);
+    },
+    sendIpcEvent(eventName, props) {
+      ipcRenderer.send(eventName, props);
+    },
     async changePath(pathType) {
-      const path = dialog.showOpenDialog({
-        properties: ["openDirectory"]
+      this.addIpcListener("pathBrowsed", (e, path) => {
+        if (path) this.changeLocalSettings(pathType, path);
       });
-      await path.then(e => {
-        if (e.filePaths[0]) {
-          this.changeLocalSettings(pathType, e.filePaths[0]);
-        }
-      });
+      this.sendIpcEvent("openDialog", { properties: ["openDirectory"] });
     },
     async selectProfile() {
-      // const path = dialog.showOpenDialog({
-      //   properties: ["openFile"],
-      //   filters: [
-      //     {
-      //       name: "файл профиля",
-      //       extensions: config.iccProfileExtensions
-      //     }
-      //   ]
-      // });
-      ipcRenderer.once("path", async (e, path) => {
-        console.log(path);
-        this.copyPath = path;
-        const profile = IO.readProfile(this.copyPath);
-        const profileDescriptor = IO.getIccDesc(profile);
-        this.localSettings.outputProfile = profileDescriptor;
+      this.addIpcListener("pathBrowsed", (e, path) => {
+        if (path) {
+          this.copyPath = path;
+          const profile = IO.readProfile(this.copyPath);
+          const profileDescriptor = IO.getIccDesc(profile);
+          this.localSettings.outputProfile = profileDescriptor;
+        }
       });
-      ipcRenderer.send("openDialog", {
+      this.sendIpcEvent("openDialog", {
         properties: ["openFile"],
         filters: [
           {
