@@ -59,7 +59,6 @@ export default {
         .on("unlinkDir", dir => {
           this.removeFolderComponent(dir);
           console.log("dir removed: ", dir);
-          console.log(this.folders);
         })
         .on("error", err => {
           console.log(err);

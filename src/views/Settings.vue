@@ -98,7 +98,23 @@ export default {
       });
     },
     async selectProfile() {
-      const path = dialog.showOpenDialog({
+      // const path = dialog.showOpenDialog({
+      //   properties: ["openFile"],
+      //   filters: [
+      //     {
+      //       name: "файл профиля",
+      //       extensions: config.iccProfileExtensions
+      //     }
+      //   ]
+      // });
+      ipcRenderer.once("path", async (e, path) => {
+        console.log(path);
+        this.copyPath = path;
+        const profile = IO.readProfile(this.copyPath);
+        const profileDescriptor = IO.getIccDesc(profile);
+        this.localSettings.outputProfile = profileDescriptor;
+      });
+      ipcRenderer.send("openDialog", {
         properties: ["openFile"],
         filters: [
           {
@@ -106,14 +122,6 @@ export default {
             extensions: config.iccProfileExtensions
           }
         ]
-      });
-      await path.then(e => {
-        if (e.filePaths[0]) {
-          this.copyPath = e.filePaths[0];
-          const profile = IO.readProfile(this.copyPath);
-          const profileDescriptor = IO.getIccDesc(profile);
-          this.localSettings.outputProfile = profileDescriptor;
-        }
       });
     }
   },

@@ -83,15 +83,16 @@ async function getProfileDescriptor(file) {
   }
 }
 async function convertProfile(file) {
-  return new Promise((resolve, reject) => {
-    gm(file)
+  try {
+    await gm(file)
       .profile(pathToProfile)
       .intent("relative")
       .write(file, err => {
-        if (!err) resolve("ok");
-        else reject(err);
+        if (!err) return "ok";
       });
-  });
+  } catch (err) {
+    return err;
+  }
 }
 function isConvertPending(profileDesc) {
   if (profileDesc == outputProfile) return false;

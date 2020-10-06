@@ -1,6 +1,6 @@
 "use strict";
 
-import { app, protocol, BrowserWindow, ipcMain } from "electron";
+import { app, protocol, BrowserWindow, ipcMain, dialog } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 // eslint-disable-next-line no-unused-vars
@@ -21,6 +21,16 @@ protocol.registerSchemesAsPrivileged([
 ipcMain.on("startReload", () => {
   console.log("settings canged =>> restarting app");
   reloadApp();
+});
+
+ipcMain.on("openDialog", async (event, data) => {
+  const path = dialog.showOpenDialog(win, data);
+  await path.then(e => {
+    console.log(e.filePaths[0]);
+    if (e.filePaths[0]) {
+      win.webContents.send("path", e.filePaths[0]);
+    }
+  });
 });
 ipcMain.on("openConverterWin", (event, data) => {
   // create the window
