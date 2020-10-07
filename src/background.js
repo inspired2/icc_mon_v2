@@ -33,9 +33,8 @@ ipcMain.on("startReload", () => {
 
 ipcMain.on("openDialog", async (event, data) => {
   const sender = identifyWinInstance(event);
-  console.log(sender);
   const path = dialog.showOpenDialog(sender, data);
-  await path.then(e => event.sender.send("pathBrowsed", e.filePaths[0]));
+  await path.then(e => event.sender.send("pathBrowsed", e.filePaths));
 });
 
 ipcMain.on("openConverterWin", (event, data) => {

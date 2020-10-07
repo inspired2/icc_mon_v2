@@ -1,9 +1,16 @@
 const { readdir } = require("fs").promises;
 const pathParse = require("path");
 import config from "../../../config";
+const { ipcRenderer } = require("electron");
 
 export const CommonMethods = {
   methods: {
+    addIpcListener(eventName, callback) {
+      ipcRenderer.once(eventName, callback);
+    },
+    sendIpcEvent(eventName, props) {
+      ipcRenderer.send(eventName, props);
+    },
     hashPath(string) {
       let hash = 0,
         i,

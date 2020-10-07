@@ -41,6 +41,9 @@ async function sharpConvert(imagePath) {
   const outputPath =
     path.join(parsedPath.dir, parsedPath.name + parsedPath.ext.substring(1)) +
     ".jpg";
+  if (fs.existsSync(outputPath)) {
+    //!!change outputPath filename if such exists
+  }
   try {
     console.log(outputPath);
     await sharp(imagePath)

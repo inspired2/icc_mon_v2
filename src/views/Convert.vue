@@ -39,9 +39,7 @@ import { CommonMethods } from "./mixins/CommonMethods";
 import { ipcRenderer } from "electron";
 import config from "../../config";
 const fs = require("fs");
-
 const settings = require("../../modules/settingsReader")();
-const { dialog } = require("electron").remote;
 
 export default {
   name: "Convert",
@@ -119,15 +117,16 @@ export default {
         this.addPaths(selected);
       }
     },
-    async getDirsList() {
-      const path = dialog.showOpenDialog({
+    getDirsList() {
+      const promise = new Promise(resolve => {
+        this.addIpcListener("pathBrowsed", (e, paths) => {
+          if (paths) resolve(paths);
+        });
+      });
+      this.sendIpcEvent("openDialog", {
         properties: ["openDirectory", "multiSelections"]
       });
-      let dirs;
-      await path.then(e => {
-        if (e.filePaths) dirs = [...e.filePaths];
-      });
-      return Promise.resolve(dirs);
+      return promise;
     },
     addPaths(arrayOfPaths) {
       const paths = arrayOfPaths.filter(path => {

@@ -36,6 +36,7 @@
 
 <script>
 import IO from "../../modules/settingsIO";
+import { CommonMethods } from "./mixins/CommonMethods";
 import { mapGetters, mapMutations } from "vuex";
 import config from "./../../config";
 import { ipcRenderer } from "electron";
@@ -53,6 +54,7 @@ export default {
       copyPath: ""
     };
   },
+  mixins: [CommonMethods],
   computed: {
     ...mapGetters(["settings"]),
     pathToDir() {
@@ -86,22 +88,17 @@ export default {
     cancelChanges() {
       this.$router.push({ name: "Home" });
     },
-    addIpcListener(eventName, callback) {
-      ipcRenderer.once(eventName, callback);
-    },
-    sendIpcEvent(eventName, props) {
-      ipcRenderer.send(eventName, props);
-    },
+
     async changePath(pathType) {
-      this.addIpcListener("pathBrowsed", (e, path) => {
-        if (path) this.changeLocalSettings(pathType, path);
+      this.addIpcListener("pathBrowsed", (e, paths) => {
+        if (paths[0]) this.changeLocalSettings(pathType, paths[0]);
       });
       this.sendIpcEvent("openDialog", { properties: ["openDirectory"] });
     },
     async selectProfile() {
-      this.addIpcListener("pathBrowsed", (e, path) => {
-        if (path) {
-          this.copyPath = path;
+      this.addIpcListener("pathBrowsed", (e, paths) => {
+        if (paths[0]) {
+          this.copyPath = paths[0];
           const profile = IO.readProfile(this.copyPath);
           const profileDescriptor = IO.getIccDesc(profile);
           this.localSettings.outputProfile = profileDescriptor;
