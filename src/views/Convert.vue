@@ -106,10 +106,6 @@ export default {
         });
         ipcRenderer.send("batchConvertImages", { id, fileList });
       });
-      //read selected dirs; ==> fileList={ dir1: [], dir2: [], ...}
-      //filter fileList. Keep expected fileextensions;
-      //send fileList to TM for checking;
-      //on response - write detailed fileList & print on screen fileNames with details
     },
     async startSelectDirDialog() {
       let selected = await this.getDirsList();
@@ -164,17 +160,6 @@ export default {
       });
       ipcRenderer.send("getMeta", { id, fileList });
     }
-    // async convertFiles() {
-    //   ipcRenderer.once(`${id}batchConvert`, res => {
-    //     //add response parsing logic
-    //     console.log(`converted `, res);
-    //   });
-    //   ipcRenderer.send("batchConvertImages", {
-    //     id,
-    //     fileList,
-    //     options: this.convertOptions
-    //   });
-    // }
   },
   created() {}
 };

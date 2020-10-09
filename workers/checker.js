@@ -38,12 +38,10 @@ const methods = {
 };
 async function sharpConvert(imagePath) {
   const parsedPath = path.parse(imagePath);
-  const outputPath =
-    path.join(parsedPath.dir, parsedPath.name + parsedPath.ext.substring(1)) +
-    ".jpg";
-  if (fs.existsSync(outputPath)) {
-    //!!change outputPath filename if such exists
-  }
+  const outputPath = composePath(parsedPath);
+  // if (fs.existsSync(outputPath)) {
+  //   //!!change outputPath filename if such exists
+  // }
   try {
     console.log(outputPath);
     await sharp(imagePath)
@@ -100,4 +98,15 @@ async function convertProfile(file) {
 function isConvertPending(profileDesc) {
   if (profileDesc == outputProfile) return false;
   else return profileDesc;
+}
+function composePath(parsedPathObj, counter = "") {
+  const outputPath =
+    path.join(
+      parsedPathObj.dir,
+      parsedPathObj.name + counter + parsedPathObj.ext.substring(1)
+    ) + ".jpg";
+  console.log(outputPath);
+  if (!fs.existsSync(outputPath)) return outputPath;
+  counter = "" + (+counter + 1);
+  return composePath(parsedPathObj, counter);
 }
