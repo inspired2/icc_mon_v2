@@ -1,37 +1,40 @@
 <template>
   <div id="converter" class="container">
-    <div class="row header">header</div>
-    <div class="row main-container">
-      <div
-        @dragover.prevent
-        @dragenter.prevent
-        @drop.stop.prevent="processDrop($event)"
-        class="col-7 drop-container"
-      >
-        DropContainer
+    <div v-if="!conversionIsRunning" class="conversion-select">
+      <div class="row header">header</div>
+      <div class="row main-container">
         <div
-          @click="removePath(dir, 'dirs')"
-          v-for="dir in dirs"
-          :key="dir"
-          class="dir-template"
+          @dragover.prevent
+          @dragenter.prevent
+          @drop.stop.prevent="processDrop($event)"
+          class="col-7 drop-container"
         >
-          {{ dir }}
+          DropContainer
+          <div
+            @click="removePath(dir, 'dirs')"
+            v-for="dir in dirs"
+            :key="dir"
+            class="dir-template"
+          >
+            {{ dir }}
+          </div>
+        </div>
+        <div class="col-3 settings-container"></div>
+        <div class="row select-button">
+          <button @click="startSelectDirDialog" class="select manual">
+            select
+          </button>
         </div>
       </div>
-      <div class="col-3 settings-container"></div>
-      <div class="row select-button">
-        <button @click="startSelectDirDialog" class="select manual">
-          select
-        </button>
-      </div>
+      <button
+        v-if="dirs.length"
+        @click="confirmSelection(dirs)"
+        class="start-convert"
+      >
+        select
+      </button>
     </div>
-    <button
-      v-if="dirs.length"
-      @click="confirmSelection(dirs)"
-      class="start-convert"
-    >
-      select
-    </button>
+    <div v-if="conversionIsRunning" class="conversion-process"></div>
   </div>
 </template>
 <script>
@@ -45,6 +48,8 @@ export default {
   name: "Convert",
   data() {
     return {
+      inProgress: false,
+      results: null,
       dirs: [],
       files: [],
       convertOptions: {
@@ -54,7 +59,11 @@ export default {
     };
   },
   mixins: [CommonMethods],
-  watch: {},
+  computed: {
+    conversionIsRunning() {
+      return this.inProgress;
+    }
+  },
   methods: {
     resetLocalState() {
       this.dirs = [];
@@ -76,9 +85,13 @@ export default {
       return array;
     },
     async confirmSelection(dirs) {
-      this.files = [];
+      this.inProgress = true;
+      // const dirsStatus = {};
+      // let sendCounter = 0;
+      // let resCounter = 0;
       let promises = [];
       dirs.forEach(dir => {
+        // dirsStatus[dir] = false;
         const promise = new Promise((resolve, reject) => {
           const list = this.getFiles(dir);
           list
@@ -95,16 +108,22 @@ export default {
         });
         promises.push(promise);
       });
-      const files = await Promise.all(promises);
-      files.forEach(dirEntry => {
-        console.log(dirEntry.files);
+      const dirEntries = await Promise.all(promises);
+      dirEntries.forEach(dirEntry => {
+        //console.log(dirEntry.files);
         const id = dirEntry.dir;
         const fileList = dirEntry.files;
 
         ipcRenderer.once(`${id}batchConvert`, (event, res) => {
-          console.log(res);
+          // resCounter++;
+          // this.results.push(res);
+          // if (sendCounter === resCounter) {
+
+          // }
         });
         ipcRenderer.send("batchConvertImages", { id, fileList });
+        // sendCounter++;
+        // console.log(sendCounter);
       });
     },
     async startSelectDirDialog() {
