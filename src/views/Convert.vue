@@ -34,7 +34,16 @@
         select
       </button>
     </div>
-    <div v-if="conversionIsRunning" class="conversion-process"></div>
+    <div v-if="conversionIsRunning" class="conversion-process">
+      <h1 class="in-progress">JOB ON THE WAY</h1>
+      <button
+        class="close-conversion-process"
+        @click.stop.prevent="closeProcessWindow"
+        :disabled="!buttonEnabled"
+      >
+        Close
+      </button>
+    </div>
   </div>
 </template>
 <script>
@@ -48,6 +57,7 @@ export default {
   name: "Convert",
   data() {
     return {
+      buttonEnabled: false,
       inProgress: false,
       results: null,
       dirs: [],
@@ -66,6 +76,8 @@ export default {
   },
   methods: {
     resetLocalState() {
+      this.results = null;
+      this.buttonEnabled = false;
       this.dirs = [];
       this.files = [];
     },
@@ -84,14 +96,19 @@ export default {
       }
       return array;
     },
-    async confirmSelection(dirs) {
-      this.inProgress = true;
-      // const dirsStatus = {};
-      // let sendCounter = 0;
-      // let resCounter = 0;
-      let promises = [];
-      dirs.forEach(dir => {
-        // dirsStatus[dir] = false;
+    closeProcessWindow() {
+      this.resetLocalState();
+      this.inProgress = false;
+    },
+    processResults(arrayOfResults) {
+      const res = arrayOfResults;
+      console.log(res);
+      this.buttonEnabled = true;
+      //this.inProgress = false;
+    },
+    buildPromisesFrom(dirList) {
+      const promises = [];
+      dirList.forEach(dir => {
         const promise = new Promise((resolve, reject) => {
           const list = this.getFiles(dir);
           list
@@ -108,23 +125,41 @@ export default {
         });
         promises.push(promise);
       });
+      return promises;
+    },
+    async confirmSelection(dirs) {
+      this.inProgress = true;
+      let results = [],
+        resCounter = 0,
+        promises = this.buildPromisesFrom(dirs),
+        jobsTotal = 0;
+      //jobsTotal = promises.length;
+      // if (jobsTotal === 0) {
+      //   this.processResults(results);
+      //   return;
+      // }
       const dirEntries = await Promise.all(promises);
       dirEntries.forEach(dirEntry => {
-        //console.log(dirEntry.files);
         const id = dirEntry.dir;
         const fileList = dirEntry.files;
-
-        ipcRenderer.once(`${id}batchConvert`, (event, res) => {
-          // resCounter++;
-          // this.results.push(res);
-          // if (sendCounter === resCounter) {
-
-          // }
-        });
-        ipcRenderer.send("batchConvertImages", { id, fileList });
-        // sendCounter++;
-        // console.log(sendCounter);
+        if (fileList.length) {
+          jobsTotal++;
+          ipcRenderer.once(`${id}batchConvert`, (event, res) => {
+            resCounter++;
+            results.push(res);
+            if (jobsTotal === resCounter) {
+              //all jobs received
+              //proceed logic
+              this.processResults(results);
+            }
+          });
+          console.log(fileList);
+          ipcRenderer.send("batchConvertImages", { id, fileList });
+        }
       });
+      if (!jobsTotal) {
+        this.processResults(null);
+      }
     },
     async startSelectDirDialog() {
       let selected = await this.getDirsList();
