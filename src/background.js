@@ -102,6 +102,7 @@ function createWindow() {
   }
 
   win.on("closed", () => {
+    windows.splice(windows.indexOf(win), 1);
     win = null;
   });
 }

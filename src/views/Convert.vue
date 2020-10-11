@@ -35,7 +35,7 @@
       </button>
     </div>
     <div v-if="conversionIsRunning" class="conversion-process">
-      <h1 class="in-progress">JOB ON THE WAY</h1>
+      <h1 class="in-progress">Идёт обработка. Подождите.</h1>
       <button
         class="close-conversion-process"
         @click.stop.prevent="closeProcessWindow"
@@ -132,29 +132,28 @@ export default {
       let results = [],
         resCounter = 0,
         promises = this.buildPromisesFrom(dirs),
-        jobsTotal = 0;
-      //jobsTotal = promises.length;
-      // if (jobsTotal === 0) {
-      //   this.processResults(results);
-      //   return;
-      // }
+        jobsTotal = 0,
+        timeout;
       const dirEntries = await Promise.all(promises);
       dirEntries.forEach(dirEntry => {
         const id = dirEntry.dir;
         const fileList = dirEntry.files;
         if (fileList.length) {
           jobsTotal++;
-          ipcRenderer.once(`${id}batchConvert`, (event, res) => {
+          ipcRenderer.once(`${id}batchConverts`, (event, res) => {
             resCounter++;
             results.push(res);
             if (jobsTotal === resCounter) {
-              //all jobs received
-              //proceed logic
+              if (timeout) clearTimeout(timeout);
               this.processResults(results);
             }
           });
-          console.log(fileList);
           ipcRenderer.send("batchConvertImages", { id, fileList });
+          if (timeout) clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            this.processResults(results);
+            console.log("conversion timedout");
+          }, 20000);
         }
       });
       if (!jobsTotal) {
