@@ -35,7 +35,7 @@
       </button>
     </div>
     <div v-if="conversionIsRunning" class="conversion-process">
-      <h1 class="in-progress">Идёт обработка. Подождите.</h1>
+      <div class="conversion-process-message">{{ message }}</div>
       <button
         class="close-conversion-process"
         @click.stop.prevent="closeProcessWindow"
@@ -63,8 +63,7 @@ export default {
       dirs: [],
       files: [],
       convertOptions: {
-        profilePath: settings.pathToProfile,
-        imageType: ".jpeg"
+        profilePath: settings.pathToProfile
       }
     };
   },
@@ -102,9 +101,11 @@ export default {
     },
     processResults(arrayOfResults) {
       const res = arrayOfResults;
-      console.log(res);
+      if(!res.length) {
+
+      }
+      //
       this.buttonEnabled = true;
-      //this.inProgress = false;
     },
     buildPromisesFrom(dirList) {
       const promises = [];
@@ -140,7 +141,7 @@ export default {
         const fileList = dirEntry.files;
         if (fileList.length) {
           jobsTotal++;
-          ipcRenderer.once(`${id}batchConverts`, (event, res) => {
+          ipcRenderer.once(`${id}batchConvert`, (event, res) => {
             resCounter++;
             results.push(res);
             if (jobsTotal === resCounter) {

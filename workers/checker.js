@@ -25,7 +25,6 @@ const methods = {
   async batchConvert(job) {
     console.log("starting converter");
     const { image } = job;
-    //const imageType = path.parse(image).ext.toLowerCase();
     return await sharpConvert(image);
   },
   async getMeta(job) {
@@ -39,9 +38,6 @@ const methods = {
 async function sharpConvert(imagePath) {
   const parsedPath = path.parse(imagePath);
   const outputPath = composePath(parsedPath);
-  // if (fs.existsSync(outputPath)) {
-  //   //!!change outputPath filename if such exists
-  // }
   try {
     console.log(outputPath);
     await sharp(imagePath)
@@ -105,7 +101,6 @@ function composePath(parsedPathObj, counter = "") {
       parsedPathObj.dir,
       parsedPathObj.name + counter + parsedPathObj.ext.substring(1)
     ) + ".jpg";
-  console.log(outputPath);
   if (!fs.existsSync(outputPath)) return outputPath;
   counter = "" + (+counter + 1);
   return composePath(parsedPathObj, counter);
