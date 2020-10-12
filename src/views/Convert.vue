@@ -22,7 +22,7 @@
         <div class="col-3 settings-container"></div>
         <div class="row select-button">
           <button @click="startSelectDirDialog" class="select manual">
-            select
+            start
           </button>
         </div>
       </div>
@@ -35,7 +35,17 @@
       </button>
     </div>
     <div v-if="conversionIsRunning" class="conversion-process">
-      <div class="conversion-process-message">{{ message }}</div>
+      <div v-if="message" class="conversion-process-message">{{ message }}</div>
+      <div v-if="arrayOfResults" class="conversion-results">
+        <div
+          v-for="entry in arrayOfResults"
+          :key="entry.image"
+          class="row result-entry"
+        >
+          <div class="path col-10">{{ entry.image | shortenPath }}</div>
+          <div class="status col-2">{{ entry.result }}</div>
+        </div>
+      </div>
       <button
         class="close-conversion-process"
         @click.stop.prevent="closeProcessWindow"
@@ -51,15 +61,17 @@ import { CommonMethods } from "./mixins/CommonMethods";
 import { ipcRenderer } from "electron";
 import config from "../../config";
 const fs = require("fs");
+const pathParse = require("path");
 const settings = require("../../modules/settingsReader")();
 
 export default {
   name: "Convert",
   data() {
     return {
+      messageText: null,
       buttonEnabled: false,
       inProgress: false,
-      results: null,
+      results: [],
       dirs: [],
       files: [],
       convertOptions: {
@@ -67,21 +79,35 @@ export default {
       }
     };
   },
+  filters: {
+    shortenPath(path) {
+      const pathObj = pathParse.parse(path);
+      const dir = pathObj.dir;
+      const dirName = dir.match(/[/\\][^/\\]+[/\\][^/\\]+$/);
+      return dirName + "/" + pathObj.base;
+    }
+  },
   mixins: [CommonMethods],
   computed: {
     conversionIsRunning() {
       return this.inProgress;
+    },
+    arrayOfResults() {
+      return this.results.length ? this.results : false;
+    },
+    message() {
+      return this.messageText;
     }
   },
   methods: {
     resetLocalState() {
-      this.results = null;
+      this.results = [];
       this.buttonEnabled = false;
       this.dirs = [];
       this.files = [];
+      this.messageText = null;
     },
     processDrop(e) {
-      //this.resetLocalState();
       const dropList = e.dataTransfer.files;
       const paths = this.arrayFrom(dropList);
       if (!paths.length) return;
@@ -100,11 +126,15 @@ export default {
       this.inProgress = false;
     },
     processResults(arrayOfResults) {
-      const res = arrayOfResults;
-      if(!res.length) {
-
+      if (!arrayOfResults?.length) {
+        this.messageText = `выбраные папки не содержат ${config.unsupportedImageTypes.concat(
+          ","
+        )}`;
+        this.buttonEnabled = true;
+        return;
       }
-      //
+      const res = arrayOfResults.flat();
+      this.results = res;
       this.buttonEnabled = true;
     },
     buildPromisesFrom(dirList) {

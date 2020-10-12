@@ -20,6 +20,7 @@ const methods = {
       });
     } catch (e) {
       console.log(e);
+      return Promise.resolve({ ...job, result: e });
     }
   },
   async batchConvert(job) {
@@ -39,7 +40,6 @@ async function sharpConvert(imagePath) {
   const parsedPath = path.parse(imagePath);
   const outputPath = composePath(parsedPath);
   try {
-    console.log(outputPath);
     await sharp(imagePath)
       .jpeg({
         quality: 100
@@ -48,8 +48,7 @@ async function sharpConvert(imagePath) {
       .toFile(outputPath);
     return { image: imagePath, result: "ok" };
   } catch (e) {
-    console.log(e);
-    return { image: imagePath, result: "error: ", e };
+    return { image: imagePath, result: `error: ${e}` };
   }
 }
 
