@@ -14,7 +14,7 @@ const watcher = chokidar.watch(dirToWatch, {
   ignored: path.join(dirToWatch, "!!!Рабочая"),
   depth: 0,
   usePolling: true,
-  persistent: false,
+  persistent: true,
   awaitWriteFinish: true,
   ignoreInitial: true,
   ignorePermissionErrors: true

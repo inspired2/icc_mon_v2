@@ -1,6 +1,15 @@
 "use strict";
 
-import { app, protocol, BrowserWindow, ipcMain, dialog } from "electron";
+import {
+  app,
+  protocol,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  Menu,
+  Tray,
+  nativeImage
+} from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 // eslint-disable-next-line no-unused-vars
@@ -13,6 +22,8 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 // be closed automatically when the JavaScript object is garbage collected.
 export let win;
 export let converterWin;
+let tray;
+
 const windows = [];
 function identifyWinInstance(eventObj) {
   for (let i = 0; i < windows.length; i++) {
@@ -21,6 +32,18 @@ function identifyWinInstance(eventObj) {
     }
   }
 }
+
+const mainMenu = new Menu.buildFromTemplate([
+  {
+    label: "Меню",
+    submenu: [
+      { label: "Настройки" },
+      { label: "Cвернуть" },
+      { label: "Выход" },
+      { label: "Консоль", role: "toggleDevTools" }
+    ]
+  }
+]);
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -43,7 +66,7 @@ ipcMain.on("openConverterWin", (event, data) => {
     Object.assign(
       {
         show: true,
-        parent: win,
+        //parent: win,
         modal: false,
         webPreferences: {
           nodeIntegration: true,
@@ -79,6 +102,7 @@ function reloadApp() {
   app.quit();
 }
 function createWindow() {
+  createTray();
   // Create the browser window.
   win = new BrowserWindow({
     width: 1400,
@@ -105,6 +129,7 @@ function createWindow() {
     windows.splice(windows.indexOf(win), 1);
     win = null;
   });
+  Menu.setApplicationMenu(mainMenu);
 }
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
@@ -151,4 +176,15 @@ if (isDevelopment) {
       app.quit();
     });
   }
+}
+
+function createTray() {
+  const icon = nativeImage.createFromPath(
+    "/home/alex/Документы/icc_mon_v2/src/assets/icon.png"
+  );
+  tray = new Tray(icon);
+  //tray.setToolTip("AstraFoto ICC Checker&Converter");
+  tray.on("click", () => {
+    win.isVisible() ? win.hide() : win.show();
+  });
 }

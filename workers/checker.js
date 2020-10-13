@@ -85,6 +85,7 @@ async function convertProfile(file) {
       .intent("relative")
       .write(file, err => {
         if (!err) return "ok";
+        else throw err;
       });
   } catch (err) {
     return err;

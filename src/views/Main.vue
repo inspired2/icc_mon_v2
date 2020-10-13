@@ -44,12 +44,13 @@ export default {
         ignored: exclusion,
         depth: 0,
         usePolling: true,
-        persistent: false,
+        persistent: true,
         awaitWriteFinish: true,
         ignoreInitial: true,
         ignorePermissionErrors: true
       });
       watcher
+        .on("ready", () => console.log("ready"))
         .on("addDir", dir => {
           if (dir !== this.settings.pathToDir) {
             console.log("dir added: ", dir);
