@@ -37,7 +37,18 @@ const mainMenu = new Menu.buildFromTemplate([
   {
     label: "Меню",
     submenu: [
-      { label: "Настройки" },
+      {
+        label: "Конвертер",
+        click: () => {
+          createConverterWin(null, { url: "converter" });
+        }
+      },
+      {
+        label: "Настройки",
+        click: () => {
+          win.webContents.send("openSettings");
+        }
+      },
       { label: "Cвернуть" },
       { label: "Выход" },
       { label: "Консоль", role: "toggleDevTools" }
@@ -60,43 +71,48 @@ ipcMain.on("openDialog", async (event, data) => {
   await path.then(e => event.sender.send("pathBrowsed", e.filePaths));
 });
 
-ipcMain.on("openConverterWin", (event, data) => {
-  // create the window
-  converterWin = new BrowserWindow(
-    Object.assign(
-      {
-        show: true,
-        //parent: win,
-        modal: false,
-        webPreferences: {
-          nodeIntegration: true,
-          plugins: true
-        }
-      },
-      data.url
-    )
-  );
-  windows.push(converterWin);
-  if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
-    converterWin.loadURL(
-      process.env.WEBPACK_DEV_SERVER_URL + `${data.url}.html`
+ipcMain.on("openConverterWin", createConverterWin);
+
+// here we can send the data to the new window
+// settings.webContents.on("did-finish-load", () => {
+//   settings.webContents.send("data", data);
+// });
+
+function createConverterWin(event, data) {
+  if (converterWin) converterWin.show();
+  else {
+    converterWin = new BrowserWindow(
+      Object.assign(
+        {
+          show: true,
+          //parent: win,
+          modal: false,
+          webPreferences: {
+            nodeIntegration: true,
+            plugins: true
+          }
+        },
+        data.url
+      )
     );
-    if (!process.env.IS_TEST) converterWin.webContents.openDevTools();
-  } else {
-    converterWin.loadURL(`app://./${data.url}.html`);
+    windows.push(converterWin);
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+      // Load the url of the dev server if in development mode
+      converterWin.loadURL(
+        process.env.WEBPACK_DEV_SERVER_URL + `${data.url}.html`
+      );
+      if (!process.env.IS_TEST) converterWin.webContents.openDevTools();
+    } else {
+      converterWin.loadURL(`app://./${data.url}.html`);
+    }
+
+    converterWin.on("closed", () => {
+      windows.splice(windows.indexOf(converterWin), 1);
+      converterWin = null;
+    });
   }
+}
 
-  converterWin.on("closed", () => {
-    windows.splice(windows.indexOf(converterWin), 1);
-    converterWin = null;
-  });
-
-  // here we can send the data to the new window
-  // settings.webContents.on("did-finish-load", () => {
-  //   settings.webContents.send("data", data);
-  // });
-});
 function reloadApp() {
   app.relaunch();
   app.quit();
@@ -183,7 +199,6 @@ function createTray() {
     "/home/alex/Документы/icc_mon_v2/src/assets/icon.png"
   );
   tray = new Tray(icon);
-  //tray.setToolTip("AstraFoto ICC Checker&Converter");
   tray.on("click", () => {
     win.isVisible() ? win.hide() : win.show();
   });

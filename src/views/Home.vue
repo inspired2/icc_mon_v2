@@ -42,6 +42,13 @@ export default {
     openConverterWin() {
       ipcRenderer.send("openConverterWin", { url: "converter" });
     }
+  },
+  created() {
+    ipcRenderer.on("openSettings", () => {
+      if (this.$router.currentRoute.name !== "Settings") {
+        this.$router.push({ name: "Settings" });
+      }
+    });
   }
 };
 </script>
