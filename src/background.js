@@ -1,5 +1,4 @@
 "use strict";
-
 import {
   app,
   protocol,
@@ -12,6 +11,7 @@ import {
 } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
+import menuTemplate from "./windowMenu.js";
 // eslint-disable-next-line no-unused-vars
 import taskManager from "../workers/taskManager";
 //export const sharp = import("sharp");
@@ -22,9 +22,11 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 // be closed automatically when the JavaScript object is garbage collected.
 export let win;
 export let converterWin;
+export { app, ipcMain };
+export const windows = [];
+
 let tray;
 
-const windows = [];
 function identifyWinInstance(eventObj) {
   for (let i = 0; i < windows.length; i++) {
     if (windows[i].webContents === eventObj.sender) {
@@ -33,28 +35,7 @@ function identifyWinInstance(eventObj) {
   }
 }
 
-const mainMenu = new Menu.buildFromTemplate([
-  {
-    label: "Меню",
-    submenu: [
-      {
-        label: "Конвертер",
-        click: () => {
-          createConverterWin(null, { url: "converter" });
-        }
-      },
-      {
-        label: "Настройки",
-        click: () => {
-          win.webContents.send("openSettings");
-        }
-      },
-      { label: "Cвернуть" },
-      { label: "Выход" },
-      { label: "Консоль", role: "toggleDevTools" }
-    ]
-  }
-]);
+const mainMenu = new Menu.buildFromTemplate(menuTemplate);
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -78,15 +59,13 @@ ipcMain.on("openConverterWin", createConverterWin);
 //   settings.webContents.send("data", data);
 // });
 
-function createConverterWin(event, data) {
+export function createConverterWin(event, data) {
   if (converterWin) converterWin.show();
   else {
     converterWin = new BrowserWindow(
       Object.assign(
         {
           show: true,
-          //parent: win,
-          modal: false,
           webPreferences: {
             nodeIntegration: true,
             plugins: true
@@ -113,11 +92,12 @@ function createConverterWin(event, data) {
   }
 }
 
-function reloadApp() {
+export function reloadApp() {
   app.relaunch();
   app.quit();
 }
-function createWindow() {
+export async function createWindow() {
+  if (win) win.show();
   createTray();
   // Create the browser window.
   win = new BrowserWindow({
@@ -140,7 +120,7 @@ function createWindow() {
     // Load the index.html when not in development
     win.loadURL("app://./index.html");
   }
-
+  win.on("close", winCloseHandler);
   win.on("closed", () => {
     windows.splice(windows.indexOf(win), 1);
     win = null;
@@ -193,13 +173,22 @@ if (isDevelopment) {
     });
   }
 }
+export function winCloseHandler(event) {
+  event.preventDefault();
+  win.hide();
+}
 
 function createTray() {
-  const icon = nativeImage.createFromPath(
-    "/home/alex/Документы/icc_mon_v2/src/assets/icon.png"
-  );
-  tray = new Tray(icon);
-  tray.on("click", () => {
-    win.isVisible() ? win.hide() : win.show();
-  });
+  if (!tray) {
+    const icon = nativeImage.createFromPath(
+      "/home/alex/Документы/icc_mon_v2/src/assets/icon.png"
+    );
+    tray = new Tray(icon);
+    tray.on("click", () => {
+      windows.forEach(win => (win.isVisible() ? win.hide() : win.show()));
+    });
+  }
+}
+export function startQuitSequence() {
+  ipcMain.emit("quit");
 }

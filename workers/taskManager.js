@@ -1,11 +1,11 @@
-import { ipcMain } from "electron";
+import { ipcMain, app } from "electron";
 import { win, converterWin } from "../src/background";
 // eslint-disable-next-line no-unused-vars
 const WorkerPool = require("./WorkerPool");
 const os = require("os");
 const cpus = os.cpus().length;
 let pool = new WorkerPool(cpus);
-
+ipcMain.on("quit", quitApp);
 ipcMain.on("reloadApp", () => {
   pool.close();
   ipcMain.emit("startReload");
@@ -63,4 +63,9 @@ function responder(err, res) {
     const id = res.id;
     win.webContents.send(`${id}done`, res);
   }
+}
+
+function quitApp() {
+  //TODO: wait for all workers to finish;
+  app.quit();
 }
