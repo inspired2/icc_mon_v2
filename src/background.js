@@ -12,14 +12,10 @@ import {
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import menuTemplate from "./windowMenu.js";
-// eslint-disable-next-line no-unused-vars
-import taskManager from "../workers/taskManager";
-//export const sharp = import("sharp");
+import "../workers/taskManager";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 export let win;
 export let converterWin;
 export { app, ipcMain };
@@ -53,11 +49,6 @@ ipcMain.on("openDialog", async (event, data) => {
 });
 
 ipcMain.on("openConverterWin", createConverterWin);
-
-// here we can send the data to the new window
-// settings.webContents.on("did-finish-load", () => {
-//   settings.webContents.send("data", data);
-// });
 
 export function createConverterWin(event, data) {
   if (converterWin) converterWin.show();
@@ -99,13 +90,10 @@ export function reloadApp() {
 export async function createWindow() {
   if (win) win.show();
   createTray();
-  // Create the browser window.
   win = new BrowserWindow({
     width: 1400,
     height: 600,
     webPreferences: {
-      // Use pluginOptions.nodeIntegration, leave this alone
-      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: true,
       nodeIntegrationInWorker: true
     }

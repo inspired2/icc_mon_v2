@@ -70,7 +70,15 @@ class WorkerPool extends EventEmitter {
   }
 
   close() {
-    for (const worker of this.workers) worker.terminate();
+    return new Promise(resolve => {
+      let amount = this.workers.length;
+      for (const worker of this.workers) {
+        worker.terminate().then(() => {
+          amount--;
+          if (!amount) resolve();
+        });
+      }
+    });
   }
 }
 

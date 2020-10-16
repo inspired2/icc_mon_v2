@@ -32,8 +32,10 @@ export default [
       {
         label: "Выход",
         click: (e, win) => {
-          main.win.removeListener("close", main.winCloseHandler);
-          main.startQuitSequence();
+          if (win == main.win) {
+            main.win.removeListener("close", main.winCloseHandler);
+            main.startQuitSequence();
+          } else win.hide();
         }
       },
       { label: "Консоль", role: "toggleDevTools" }

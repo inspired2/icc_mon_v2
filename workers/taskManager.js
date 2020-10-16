@@ -66,6 +66,9 @@ function responder(err, res) {
 }
 
 function quitApp() {
-  //TODO: wait for all workers to finish;
-  app.quit();
+  try {
+    pool.close().then(() => app.quit());
+  } catch (e) {
+    app.quit();
+  }
 }
