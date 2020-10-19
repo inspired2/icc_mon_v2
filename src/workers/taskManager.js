@@ -1,10 +1,10 @@
 import { ipcMain, app } from "electron";
-import { win, converterWin } from "../src/background";
+import { win, converterWin } from "../background";
 // eslint-disable-next-line no-unused-vars
 const WorkerPool = require("./WorkerPool");
 const os = require("os");
 const cpus = os.cpus().length;
-let pool = new WorkerPool(cpus);
+const pool = new WorkerPool(cpus);
 ipcMain.on("quit", quitApp);
 ipcMain.on("reloadApp", () => {
   pool.close();

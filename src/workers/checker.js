@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const gm = require("gm");
 const ExifReader = require("exifreader");
-const settings = require("../modules/settingsReader")();
+const settings = require("../../modules/settingsReader")();
 const { pathToProfile, outputProfile } = settings;
 const sharp = require("sharp");
 

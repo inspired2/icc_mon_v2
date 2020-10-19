@@ -12,10 +12,10 @@ import {
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import menuTemplate from "./windowMenu.js";
-import "../workers/taskManager";
+import "./workers/taskManager";
+import "./workers/taskManager";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
-
 export let win;
 export let converterWin;
 export { app, ipcMain };

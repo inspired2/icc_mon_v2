@@ -14,6 +14,7 @@
 import { ipcRenderer } from "electron";
 import { CommonMethods } from "./mixins/CommonMethods";
 import config from "../../config";
+// eslint-disable-next-line no-unused-vars
 const pathParse = require("path");
 const chokidar = require("chokidar");
 

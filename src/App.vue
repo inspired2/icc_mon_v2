@@ -57,7 +57,7 @@ export default {
       }
     }
   },
-  created() {
+  async created() {
     this.checkSettings();
   }
 };
@@ -68,7 +68,8 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color:rgb(143, 143, 143);
+  background-color: #2c3e50;
 }
 
 #nav {

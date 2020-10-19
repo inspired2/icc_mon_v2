@@ -30,7 +30,9 @@ class WorkerPool extends EventEmitter {
     return this.workers.length === this.freeWorkers.length;
   }
   addNewWorker() {
-    const worker = new Worker(path.resolve(__dirname, "../workers/checker.js"));
+    const worker = new Worker(
+      path.resolve(__dirname, "../src/workers/checker.js")
+    );
     worker.on("message", result => {
       // In case of success: Call the callback that was passed to `runTask`,
       // remove the `TaskInfo` associated with the Worker, and mark it as free
