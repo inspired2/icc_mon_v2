@@ -9,6 +9,8 @@
 import IO from "../modules/settingsIO.js";
 import { mapGetters, mapMutations } from "vuex";
 import readSettings from "../modules/settingsReader";
+const app = require("electron").remote;
+console.log(app);
 
 export default {
   computed: {

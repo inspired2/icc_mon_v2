@@ -4,6 +4,7 @@
     <button @click="scanForFolders" class="scan-manually">Scan</button>
     <div id="folders" class="row working-folders">
       <folder-component
+        :poolRef="poolRef"
         :key="folder.id"
         :path="folder.dirName"
         :folderId="folder.id"
@@ -23,18 +24,23 @@ import FolderComponent from "../views/FolderComponent";
 import { CommonMethods } from "./mixins/CommonMethods";
 const chokidar = require("chokidar");
 const path = require("path");
+const app = require("electron").remote;
 
 export default {
   data() {
     return {
-      folders: []
+      folders: [],
+      pool: null
     };
   },
   components: {
     "folder-component": FolderComponent
   },
   computed: {
-    ...mapGetters(["settings"])
+    ...mapGetters(["settings"]),
+    poolRef() {
+      return this.pool;
+    }
   },
   methods: {
     startWatcher() {
@@ -107,6 +113,7 @@ export default {
   mixins: [CommonMethods],
   created() {
     this.startWatcher();
+    this.pool = app.app.pool;
   }
 };
 </script>

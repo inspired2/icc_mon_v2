@@ -1,4 +1,5 @@
 import * as main from "./background.js";
+
 export default [
   {
     label: "Меню",

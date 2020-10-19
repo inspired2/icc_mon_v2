@@ -30,12 +30,15 @@ export default {
     totalImages() {
       return this.fileList.length;
     },
+    poolIsIdle() {
+      return this.poolRef.isIdle();
+    },
     taskFinished() {
       const total = this.totalImages;
-      return total === this.checkedImages;
+      return total === this.checkedImages && this.poolIsIdle;
     }
   },
-  props: ["path", "folderId"],
+  props: ["path", "folderId", "poolRef"],
   filters: {
     folderName(path) {
       return pathParse.basename(path);

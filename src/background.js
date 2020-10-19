@@ -12,15 +12,14 @@ import {
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import menuTemplate from "./windowMenu.js";
-import "./workers/taskManager";
-import "./workers/taskManager";
-
+// eslint-disable-next-line no-unused-vars
+import { pool } from "./workers/taskManager";
+app.pool = pool;
 const isDevelopment = process.env.NODE_ENV !== "production";
 export let win;
 export let converterWin;
 export { app, ipcMain };
 export const windows = [];
-
 let tray;
 
 function identifyWinInstance(eventObj) {

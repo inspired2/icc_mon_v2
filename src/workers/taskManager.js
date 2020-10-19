@@ -4,7 +4,7 @@ import { win, converterWin } from "../background";
 const WorkerPool = require("./WorkerPool");
 const os = require("os");
 const cpus = os.cpus().length;
-const pool = new WorkerPool(cpus);
+export const pool = new WorkerPool(cpus);
 ipcMain.on("quit", quitApp);
 ipcMain.on("reloadApp", () => {
   pool.close();
