@@ -22,9 +22,10 @@ import { readdirSync } from "fs";
 import { mapGetters } from "vuex";
 import FolderComponent from "../views/FolderComponent";
 import { CommonMethods } from "./mixins/CommonMethods";
+import { ipcRenderer } from "electron";
 const chokidar = require("chokidar");
 const path = require("path");
-const app = require("electron").remote;
+const remote = require("electron").remote;
 
 export default {
   data() {
@@ -113,7 +114,13 @@ export default {
   mixins: [CommonMethods],
   created() {
     this.startWatcher();
-    this.pool = app.app.pool;
+  },
+  beforeMount() {
+    ipcRenderer.on("poolReady", (e, propName) => {
+      console.log(remote.app[propName]);
+      // eslint-disable-next-line no-unused-vars
+      this.pool = remote.app[propName];
+    });
   }
 };
 </script>
