@@ -14,7 +14,7 @@ import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import menuTemplate from "./windowMenu.js";
 // eslint-disable-next-line no-unused-vars
 import { pool } from "./workers/taskManager";
-//app.pool = pool;
+app.pool = pool;
 const isDevelopment = process.env.NODE_ENV !== "production";
 export let win;
 export let converterWin;
@@ -113,14 +113,6 @@ export async function createWindow() {
     win = null;
   });
   Menu.setApplicationMenu(mainMenu);
-  win.webContents.on("did-finish-load", () => {
-    const appRef = "appRef";
-    Object.defineProperty(app, appRef, {
-      enumerable: true,
-      value: pool
-    });
-    win.webContents.send("poolReady", appRef);
-  });
 }
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {

@@ -23,7 +23,9 @@ export default {
     return {
       convertedImages: 0,
       checkedImages: 0,
-      fileList: []
+      fileList: [],
+      idleFlag: true,
+      timeout: null
     };
   },
   computed: {
@@ -31,7 +33,7 @@ export default {
       return this.fileList.length;
     },
     poolIsIdle() {
-      return this.poolRef.isIdle();
+      return this.poolRef.isIdle() && this.idleFlag;
     },
     taskFinished() {
       const total = this.totalImages;
@@ -63,6 +65,8 @@ export default {
       this.checkedImages = 0;
       this.convertedImages = 0;
       this.fileList = [];
+      // if (this.timeout) clearTimeout(this.timeout);
+      // this.timeout = null;
     },
     startFileWatcher(path) {
       const watcher = chokidar.watch(path, {
@@ -76,12 +80,23 @@ export default {
         .on("add", file => {
           if (this.isCheckPending(file)) {
             this.checkImage(file);
+            this.handleIdleFlag();
           }
         })
         .on("error", err => {
           console.log(err);
         });
       this.startFileWatcher.watcher = watcher;
+    },
+    handleIdleFlag() {
+      this.idleFlag = false;
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+        console.log(this.timeout);
+      }
+      this.timeout = setTimeout(() => {
+        this.idleFlag = true;
+      }, 3000);
     },
     async checkManually(dir) {
       this.startFileWatcher.watcher.close();
@@ -90,6 +105,7 @@ export default {
       files.forEach(file => {
         if (this.isCheckPending(file)) {
           this.checkImage(file);
+          this.handleIdleFlag();
         }
       });
     }
