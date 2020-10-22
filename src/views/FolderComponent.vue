@@ -17,6 +17,7 @@ import config from "../../config";
 // eslint-disable-next-line no-unused-vars
 const pathParse = require("path");
 const chokidar = require("chokidar");
+const timeoutName = Symbol("timeout");
 
 export default {
   data() {
@@ -25,19 +26,25 @@ export default {
       checkedImages: 0,
       fileList: [],
       idleFlag: true,
-      timeout: null
+      [timeoutName]: null
     };
   },
   computed: {
+    getTimerCounter() {
+      return this.counter;
+    },
     totalImages() {
       return this.fileList.length;
     },
+    flag() {
+      return this.idleFlag;
+    },
     poolIsIdle() {
-      return this.poolRef.isIdle() && this.idleFlag;
+      return this.poolRef.isIdle();
     },
     taskFinished() {
       const total = this.totalImages;
-      return total === this.checkedImages && this.poolIsIdle;
+      return (total === this.checkedImages) && this.poolIsIdle && this.flag;
     }
   },
   props: ["path", "folderId", "poolRef"],
@@ -90,11 +97,10 @@ export default {
     },
     handleIdleFlag() {
       this.idleFlag = false;
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-        console.log(this.timeout);
+      if (this[timeoutName]) {
+        clearTimeout(this[timeoutName]);
       }
-      this.timeout = setTimeout(() => {
+      this[timeoutName] = setTimeout(() => {
         this.idleFlag = true;
       }, 3000);
     },
