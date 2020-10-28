@@ -1,3 +1,4 @@
+os: windows
 matrix:
   include:
     - os: windows
