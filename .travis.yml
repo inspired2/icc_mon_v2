@@ -11,6 +11,7 @@ deploy:
   user: inspired2@yandex.ru
   password:
     secure: iK9fToWdIBXCeeREmuknMTuCJ86LjeJgYNjYJ8KpIThi23/XdfuxdoBZoP2+vxJgw79J/M3obXSUC1IL5rL0nEd2wAZxV//oWM4c7NNpIU1/oDW3DMoUk4WdoxQ/38r36OXHhspeOD2MCRWe/lAx04T1wbONAfNPnTr5ZWo1XYsMCmhHkxCD6OSmBt0pazmH1hr8K3r14p0o+WARX1Ixq51n04yrFuULN3EvaRT1YTs8ONXjbwHp8W4xYTcy6Q+XU7sqztz9u0QPq5fBzXqfbAwmVxLkE9sapZrLUkENSbBoGx0BE/AWJigh6B17dPLpbS4dhV6lqW6LJmkn2dWxdrWOl2mCx2G3snpVKE4+eABsguB+ghoCiXD1P/RRUjdmnX0y0O6Z3j3Daho6phgABD2qf1ktQv7ELHgxUBI+cYesI3SEjH8pYPTyMwBp5/5L0F4ZnPvYx+UTBravRv8q3XVc6nmlmNyoIG5yyBds4Se/gpLHdE7at4I+pCDz84VPPacRzC4Uio/O/m1Ghl/6vDcSEoOI5vtg/YNfWMTEPNqlIyDwWmcEDjbwdwaEY/fSyXxxw9VdO7Fech4kAR4z1JtCea99eE3ehA1DiAnMyadcuYARX4zvPzirHFUKGGJuxZa0FpCDdfOo5nIsSKA2dkENlMKo/sr0zZvQ0dTU3Ro=
-  file: $RELEASE_NAME
+  file: "test"
   skip_cleanup: true
-  overwrite: true
+  on:
+    tags: false
