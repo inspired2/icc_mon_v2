@@ -2,6 +2,21 @@ language: node_js
 node_js:
 - '10'
 os: windows
+before_script:
+- npm install -g postcss-cli autoprefixer cssnano
+script:
+- postcss --use autoprefixer cssnano -d build static/css/*.css
+env:
+  global:
+    - RELEASE_NAME=icc_mon2
+before_deploy:
+- rm -rf $RELEASE_NAME || exit 0
+- mkdir $RELEASE_NAME
+- cp LICENSE $RELEASE_NAME/
+- cp -a ./static $RELEASE_NAME/
+- cp -f build/*css $RELEASE_NAME/static/css/
+- tar -czf $RELEASE_NAME-$TRAVIS_TAG.tar.gz $RELEASE_NAME
+- zip -r $RELEASE_NAME-$TRAVIS_TAG.zip $RELEASE_NAME
 deploy:
   provider: releases
   user: inspired2@yandex.ru
