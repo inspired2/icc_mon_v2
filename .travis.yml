@@ -9,5 +9,3 @@ deploy:
   file: "travis"
   skip_cleanup: true
   overwrite: true
-  on:
-    tags: true
