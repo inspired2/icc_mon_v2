@@ -40,8 +40,7 @@ script:
         electronuserland/builder:wine \
         /bin/bash -c "yarn --link-duplicates --pure-lockfile"
     fi
-api_key:
-    secure: Ky7q7oaRF5TXOxRXxAbEPPRwt192H4uPRQsA3Chq7KGGZvZf1c7SChxBV5v7quULmCaAo/EXwuLZ/hfZ76CEw/pvJga1kgIba5lZivWPxOhsL5j5KbqwPYM9S0OxuabPPbCyKg5YA/IsHuZ1XEbqqKlU93kjozSi3b1UtQ19FK8bUqnRUoPHUPIB+ibSrwdFoCqUcipf8YnQS5d9ceyNDLdWJqqoJaaxhXVszW19H6BQo0gyCt9rR4tzDSB8CNsUTWw6WoGycNQP1UylMatzavMDFRJjWzAMTCXK6xwWQLvZnIR8CnN92T0TlKefHGXVBO4aUCa7vETZLXFiKvhibdvv67/psPrK/C2z5VPmE3ZfZ6ySEXkPX7wMhOgo0pn8tePgTiLmNmOvQKfk6kuGz3927O+3DcMqZVwe6DkO/twC2wi9BH0+Tf4XQ6o83GEuQeDe0iCeb8aEjMaDprO0e3phHYDvh7Ed/M4HaPrsAy6A63K61nJ3rayIN5Q5o7yOOmsePvadBfm5uAARaJfPtqjoA96L38caHgcbJaPHK5vi7ITLBphQ9pbt2qaehUEem9vb2/uM+o/mVQsbC7jNdZx6lAN4hxdXO5CErx0pDZeC3XeqtIrzQqc6NgInk5JVM5z102d3IgWwQgswdrdh3vEcv2fw/xi40ftTIIDXN2g=
+
 # only deploy to github on a merge to the prod branch
 deploy:
   provider: script
