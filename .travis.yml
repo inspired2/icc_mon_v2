@@ -2,3 +2,10 @@ language: "node_js"
 node_js: 
   - "10"
 os: windows
+deploy:
+  provider: releases
+  api_key: "GITHUB OAUTH TOKEN"
+  file: "FILE TO UPLOAD"
+  skip_cleanup: true
+  on:
+    tags: true
