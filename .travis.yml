@@ -4,8 +4,8 @@ node_js:
 os: windows
 deploy:
   provider: releases
-  api_key: "GITHUB OAUTH TOKEN"
-  file: "FILE TO UPLOAD"
+  api_key: "4365d8d5855b8dcfddcec14305170b6a43799e49"
+  file: "travis"
   skip_cleanup: true
   on:
     tags: true
