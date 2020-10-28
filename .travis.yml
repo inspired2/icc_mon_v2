@@ -6,9 +6,6 @@ os: windows
 env:
   global:
     - RELEASE_NAME=icc_mon2
-before_deploy:
-- tar -czf $RELEASE_NAME-$TRAVIS_TAG.tar.gz $RELEASE_NAME
-- zip -r $RELEASE_NAME-$TRAVIS_TAG.zip $RELEASE_NAME
 deploy:
   provider: releases
   user: inspired2@yandex.ru
