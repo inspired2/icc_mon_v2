@@ -10,7 +10,6 @@ env:
 before_deploy:
 - rm -rf $RELEASE_NAME || exit 0
 - mkdir $RELEASE_NAME
-- cp LICENSE $RELEASE_NAME/
 - cp -a ./static $RELEASE_NAME/
 - cp -f build/*css $RELEASE_NAME/static/css/
 - tar -czf $RELEASE_NAME-$TRAVIS_TAG.tar.gz $RELEASE_NAME
