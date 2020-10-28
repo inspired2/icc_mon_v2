@@ -5,6 +5,9 @@ os: windows
 env:
   global:
   - RELEASE_NAME=icc_mon2
+before_deploy:
+  - make build TAG=latest
+  - make run TAG=latest CMD=version
 deploy:
   provider: releases
   api_key:
@@ -12,3 +15,4 @@ deploy:
   on:
     repo: inspired2/icc_mon_v2
     branch: master
+    tags: true
