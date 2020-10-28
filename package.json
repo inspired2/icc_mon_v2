@@ -26,7 +26,7 @@
     "vuex": "^3.4.0"
   },
   "author": "Alexander Tchepournov",
-
+  "release": "electron:build",
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
