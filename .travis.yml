@@ -4,8 +4,10 @@ node_js:
 os: windows
 deploy:
   provider: releases
-  api_key: "4365d8d5855b8dcfddcec14305170b6a43799e49"
+  user: "inspired2@yandex.ru"
+  password: "FAM74b2em"
   file: "travis"
   skip_cleanup: true
+  overwrite: true
   on:
     tags: true
