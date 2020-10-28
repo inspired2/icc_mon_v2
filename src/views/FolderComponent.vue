@@ -25,7 +25,7 @@ export default {
       convertedImages: 0,
       checkedImages: 0,
       fileList: [],
-      idleFlag: true,
+      idleFlag: false,
       [timeoutName]: null
     };
   },
@@ -44,7 +44,7 @@ export default {
     },
     taskFinished() {
       const total = this.totalImages;
-      return (total === this.checkedImages) && this.poolIsIdle && this.flag;
+      return total === this.checkedImages && this.poolIsIdle && this.flag;
     }
   },
   props: ["path", "folderId", "poolRef"],
@@ -121,6 +121,11 @@ export default {
     if (config.autostartFileWatcher) {
       this.startFileWatcher(this.path);
     }
+  },
+  created() {
+    this[timeoutName] = setTimeout(() => {
+      this.idleFlag = true;
+    }, 5000);
   }
 };
 </script>

@@ -88,7 +88,7 @@ export function reloadApp() {
 }
 export async function createWindow() {
   if (win) win.show();
-  createTray();
+  //createTray();
   win = new BrowserWindow({
     width: 1400,
     height: 600,
