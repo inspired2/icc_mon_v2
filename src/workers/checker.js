@@ -64,11 +64,17 @@ async function getProfileDescriptor(file) {
   const buffer = fs.readFileSync(file);
   if (buffer) {
     let tags;
+    const descriptor = {};
     try {
       tags = ExifReader.load(buffer, { expanded: true });
       if (tags.icc) {
-        return tags.icc["ICC Description"].value;
-      } else return { tags };
+        descriptor.icc = tags.icc["ICC Description"].value;
+      }
+      if (tags.exif?.ColorSpace?.description) {
+        descriptor.space = tags.exif.ColorSpace.description;
+      }
+      if (Object.keys(descriptor).length) return descriptor;
+      else return { tags };
     } catch (e) {
       console.log("error in exifreader", e);
       tags = null;
@@ -92,8 +98,11 @@ async function convertProfile(file) {
   }
 }
 function isConvertPending(profileDesc) {
-  if (profileDesc == outputProfile) return false;
-  else return profileDesc;
+  console.log(profileDesc);
+  const regExp = /sRGB\b/;
+  if (profileDesc?.icc == outputProfile) return false;
+  else if (regExp.test(profileDesc.space) && !profileDesc.icc) return false;
+  else return profileDesc; //true
 }
 function composePath(parsedPathObj, counter = "") {
   const outputPath =

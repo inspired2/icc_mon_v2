@@ -17,25 +17,34 @@ import config from "../../config";
 // eslint-disable-next-line no-unused-vars
 const pathParse = require("path");
 const chokidar = require("chokidar");
+const timeoutName = Symbol("timeout");
 
 export default {
   data() {
     return {
       convertedImages: 0,
       checkedImages: 0,
-      fileList: []
+      fileList: [],
+      idleFlag: false,
+      [timeoutName]: null
     };
   },
   computed: {
+    getTimerCounter() {
+      return this.counter;
+    },
     totalImages() {
       return this.fileList.length;
+    },
+    flag() {
+      return this.idleFlag;
     },
     poolIsIdle() {
       return this.poolRef.isIdle();
     },
     taskFinished() {
       const total = this.totalImages;
-      return total === this.checkedImages && this.poolIsIdle;
+      return total === this.checkedImages && this.poolIsIdle && this.flag;
     }
   },
   props: ["path", "folderId", "poolRef"],
@@ -63,6 +72,8 @@ export default {
       this.checkedImages = 0;
       this.convertedImages = 0;
       this.fileList = [];
+      // if (this.timeout) clearTimeout(this.timeout);
+      // this.timeout = null;
     },
     startFileWatcher(path) {
       const watcher = chokidar.watch(path, {
@@ -76,12 +87,22 @@ export default {
         .on("add", file => {
           if (this.isCheckPending(file)) {
             this.checkImage(file);
+            this.handleIdleFlag();
           }
         })
         .on("error", err => {
           console.log(err);
         });
       this.startFileWatcher.watcher = watcher;
+    },
+    handleIdleFlag() {
+      this.idleFlag = false;
+      if (this[timeoutName]) {
+        clearTimeout(this[timeoutName]);
+      }
+      this[timeoutName] = setTimeout(() => {
+        this.idleFlag = true;
+      }, 3000);
     },
     async checkManually(dir) {
       this.startFileWatcher.watcher.close();
@@ -90,6 +111,7 @@ export default {
       files.forEach(file => {
         if (this.isCheckPending(file)) {
           this.checkImage(file);
+          this.handleIdleFlag();
         }
       });
     }
@@ -99,6 +121,11 @@ export default {
     if (config.autostartFileWatcher) {
       this.startFileWatcher(this.path);
     }
+  },
+  created() {
+    this[timeoutName] = setTimeout(() => {
+      this.idleFlag = true;
+    }, 5000);
   }
 };
 </script>
