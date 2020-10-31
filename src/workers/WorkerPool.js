@@ -1,7 +1,7 @@
 const { AsyncResource } = require("async_hooks");
 const { EventEmitter } = require("events");
 const path = require("path");
-const { Worker } = require("worker_threads");
+const { Worker } = require("threads");
 const kTaskInfo = Symbol("kTaskInfo");
 const kWorkerFreedEvent = Symbol("kWorkerFreedEvent");
 
