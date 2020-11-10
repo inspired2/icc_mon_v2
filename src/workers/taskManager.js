@@ -1,5 +1,6 @@
 import { ipcMain, app } from "electron";
 import { win, converterWin } from "../background";
+
 // eslint-disable-next-line no-unused-vars
 const WorkerPool = require("./WorkerPool");
 const os = require("os");

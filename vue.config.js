@@ -1,9 +1,7 @@
-const ThreadsPlugin = require("threads-plugin");
+//const ThreadsPlugin = require("threads-plugin");
 module.exports = {
   //...
-  configureWebpack: {
-    plugins: [new ThreadsPlugin({ target: "electron-node-worker" })]
-  },
+  configureWebpack: {},
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true

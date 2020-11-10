@@ -1,9 +1,14 @@
 const { AsyncResource } = require("async_hooks");
 const { EventEmitter } = require("events");
 const path = require("path");
-const { Worker } = require("threads");
+const fs = require("fs");
 const kTaskInfo = Symbol("kTaskInfo");
 const kWorkerFreedEvent = Symbol("kWorkerFreedEvent");
+const WorkerContents = fs.readFileSync(path.resolve(__dirname, "checker.js"), {
+  encoding: "utf-8"
+});
+const settings = require("../../modules/settingsReader")();
+const { Worker } = require("worker_threads");
 
 class WorkerPoolTaskInfo extends AsyncResource {
   constructor(callback) {
@@ -30,9 +35,7 @@ class WorkerPool extends EventEmitter {
     return this.workers.length === this.freeWorkers.length;
   }
   addNewWorker() {
-    const worker = new Worker(
-      path.resolve(__dirname, "../src/workers/checker.js")
-    );
+    const worker = new Worker(WorkerContents, { eval: true });
     worker.on("message", result => {
       // In case of success: Call the callback that was passed to `runTask`,
       // remove the `TaskInfo` associated with the Worker, and mark it as free
@@ -63,7 +66,7 @@ class WorkerPool extends EventEmitter {
       this.once(kWorkerFreedEvent, () => this.runTask(task, callback));
       return;
     }
-
+    task.settings = settings;
     const worker = this.freeWorkers.pop();
     worker[kTaskInfo] = new WorkerPoolTaskInfo(callback);
     //console.log("workers: ", this.workers.length);
