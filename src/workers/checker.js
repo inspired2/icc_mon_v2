@@ -3,9 +3,9 @@ const path = require("path");
 const fs = require("fs");
 const gm = require("gm");
 const ExifReader = require("exifreader");
-const settings = require("../../modules/settingsReader")();
-const { pathToProfile, outputProfile } = settings;
 const sharp = require("sharp");
+
+let pathToProfile, outputProfile;
 
 const methods = {
   async checkImage(job) {
@@ -53,6 +53,8 @@ async function sharpConvert(imagePath) {
 }
 
 parentPort.on("message", async job => {
+  outputProfile = job.settings.outputProfile;
+  pathToProfile = job.settings.pathToProfile;
   console.log("worker recieved job: ", job);
   await methods[job.type](job).then(res => {
     console.log("worker complete job, sending res to TM:", res);
