@@ -4,7 +4,11 @@ const path = require("path");
 const fs = require("fs");
 const kTaskInfo = Symbol("kTaskInfo");
 const kWorkerFreedEvent = Symbol("kWorkerFreedEvent");
-const WorkerContents = fs.readFileSync(path.resolve(__dirname, "checker.js"), {
+const isDevelopment = process.env.NODE_ENV !== "production";
+const workerPath = isDevelopment
+  ? path.resolve("./src/workers/checker.js")
+  : path.resolve(process.resourcesPath, "..", "checker.js");
+const WorkerContents = fs.readFileSync(workerPath, {
   encoding: "utf-8"
 });
 const settings = require("../../modules/settingsReader")();

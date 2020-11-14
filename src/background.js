@@ -1,4 +1,5 @@
 "use strict";
+const isDevelopment = process.env.NODE_ENV !== "production";
 import {
   app,
   protocol,
@@ -6,21 +7,20 @@ import {
   ipcMain,
   dialog,
   Menu,
-  Tray,
-  nativeImage
+  // Tray,
+  // nativeImage
 } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import menuTemplate from "./windowMenu.js";
 // eslint-disable-next-line no-unused-vars
+export { app, ipcMain, isDevelopment };
 import { pool } from "./workers/taskManager";
 app.pool = pool;
-const isDevelopment = process.env.NODE_ENV !== "production";
 export let win;
 export let converterWin;
-export { app, ipcMain };
 export const windows = [];
-let tray;
+//let tray;
 
 function identifyWinInstance(eventObj) {
   for (let i = 0; i < windows.length; i++) {
@@ -165,17 +165,17 @@ export function winCloseHandler(event) {
   win.hide();
 }
 
-function createTray() {
-  if (!tray) {
-    const icon = nativeImage.createFromPath(
-      "/home/alex/Документы/icc_mon_v2/src/assets/icon.png"
-    );
-    tray = new Tray(icon);
-    tray.on("click", () => {
-      windows.forEach(win => (win.isVisible() ? win.hide() : win.show()));
-    });
-  }
-}
+// function createTray() {
+//   if (!tray) {
+//     const icon = nativeImage.createFromPath(
+//       "/home/alex/Документы/icc_mon_v2/src/assets/icon.png"
+//     );
+//     tray = new Tray(icon);
+//     tray.on("click", () => {
+//       windows.forEach(win => (win.isVisible() ? win.hide() : win.show()));
+//     });
+//   }
+// }
 export function startQuitSequence() {
   ipcMain.emit("quit");
 }

@@ -4,7 +4,15 @@ module.exports = {
   configureWebpack: {},
   pluginOptions: {
     electronBuilder: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      builderOptions: {
+        extraResources: [
+          {
+            from: "src/workers/checker.js",
+            to: "checker.js"
+          }
+        ]
+      }
     }
   },
   pages: {
