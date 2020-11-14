@@ -9,7 +9,7 @@ module.exports = {
         extraResources: [
           {
             from: "src/workers/checker.js",
-            to: "checker.js"
+            to: "../checker.js"
           }
         ]
       }
