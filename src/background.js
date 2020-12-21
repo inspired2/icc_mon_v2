@@ -1,5 +1,6 @@
 "use strict";
 const isDevelopment = process.env.NODE_ENV !== "production";
+const chokidar = require("chokidar");
 import {
   app,
   protocol,
@@ -17,6 +18,7 @@ import menuTemplate from "./windowMenu.js";
 export { app, ipcMain, isDevelopment };
 import { pool } from "./workers/taskManager";
 app.pool = pool;
+app.chokidar = chokidar;
 export let win;
 export let converterWin;
 export const windows = [];

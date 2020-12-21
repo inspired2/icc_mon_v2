@@ -15,8 +15,9 @@ import { ipcRenderer } from "electron";
 import { CommonMethods } from "./mixins/CommonMethods";
 import config from "../../config";
 // eslint-disable-next-line no-unused-vars
+const remote = require("electron").remote;
 const pathParse = require("path");
-const chokidar = require("chokidar");
+const chokidar = remote.app.chokidar; //require("chokidar");
 const timeoutName = Symbol("timeout");
 
 export default {

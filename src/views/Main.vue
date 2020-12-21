@@ -23,9 +23,9 @@ import { mapGetters } from "vuex";
 import FolderComponent from "../views/FolderComponent";
 import { CommonMethods } from "./mixins/CommonMethods";
 //import { ipcRenderer } from "electron";
-const chokidar = require("chokidar");
 const path = require("path");
 const remote = require("electron").remote;
+const chokidar = remote.app.chokidar; //require("chokidar");
 
 export default {
   data() {
