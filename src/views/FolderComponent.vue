@@ -81,7 +81,7 @@ export default {
       const watcher = chokidar.watch(path, {
         ignored: /[/\\]\./,
         persistent: true,
-        awaitWriteFinish: true,
+        //awaitWriteFinish: true,
         ignorePermissionErrors: true,
         usePolling: true
       });
