@@ -4,7 +4,7 @@
     <p>totalImages: {{ totalImages }}</p>
     <p>checkedImages: {{ checkedImages }}</p>
     <p>convertedImages: {{ convertedImages }}</p>
-    <!-- <p>flag: {{ flag }}, isIdlePool: {{ poolIsIdle }}</p> -->
+    <p>flag: {{ flag }}, isIdlePool: {{ poolIsIdle }}</p>
     <button @click="checkManually(path)" :disabled="!taskFinished">
       Check Manually
     </button>

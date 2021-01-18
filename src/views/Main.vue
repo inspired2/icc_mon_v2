@@ -1,6 +1,9 @@
 <template>
   <div id="main" class="container">
     <h1>Main</h1>
+    <p>
+      Workers: {{ poolRef.workers.length }}; free workers: {{ poolRef.freeWorkers.length }}
+    </p>
     <button @click="scanForFolders" class="scan-manually">Scan</button>
     <div id="folders" class="row working-folders">
       <folder-component

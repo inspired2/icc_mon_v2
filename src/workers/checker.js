@@ -19,12 +19,12 @@ const methods = {
         return Promise.resolve({ id, file, wrongProfile: result });
       });
     } catch (e) {
-      console.log(e);
+      //console.log(e);
       return Promise.resolve({ ...job, result: e });
     }
   },
   async batchConvert(job) {
-    console.log("starting converter");
+    //console.log("starting converter");
     const { image } = job;
     return await sharpConvert(image);
   },
@@ -55,9 +55,9 @@ async function sharpConvert(imagePath) {
 parentPort.on("message", async job => {
   outputProfile = job.settings.outputProfile;
   pathToProfile = job.settings.pathToProfile;
-  console.log("worker recieved job: ", job);
+  //console.log("worker recieved job: ", job);
   await methods[job.type](job).then(res => {
-    console.log("worker complete job, sending res to TM:", res);
+    //console.log("worker complete job, sending res to TM:", res);
     parentPort.postMessage(res);
   });
 });
@@ -100,7 +100,7 @@ async function convertProfile(file) {
   }
 }
 function isConvertPending(profileDesc) {
-  console.log(profileDesc);
+  //console.log(profileDesc);
   const regExp = /sRGB\b/;
   if (profileDesc?.icc == outputProfile) return false;
   else if (regExp.test(profileDesc.space) && !profileDesc.icc) return false;

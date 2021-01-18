@@ -32,7 +32,7 @@ class WorkerPool extends EventEmitter {
     this.numThreads = numThreads;
     this.workers = [];
     this.freeWorkers = [];
-    this.setMaxListeners(5000);
+    this.setMaxListeners(50000);
     for (let i = 0; i < numThreads; i++) this.addNewWorker();
   }
   isIdle() {
@@ -48,6 +48,7 @@ class WorkerPool extends EventEmitter {
       worker[kTaskInfo] = null;
       this.freeWorkers.push(worker);
       this.emit(kWorkerFreedEvent);
+      console.log(this.freeWorkers.length);
     });
     worker.on("error", err => {
       // In case of an uncaught exception: Call the callback that was passed to
