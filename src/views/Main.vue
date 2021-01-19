@@ -1,9 +1,7 @@
 <template>
   <div id="main" class="container">
     <h1>Main</h1>
-    <p>
-      Workers: {{ poolRef.workers.length }}; free workers: {{ poolRef.freeWorkers.length }}
-    </p>
+    <p>PoolIsIdle: {{ poolIsIdle }}</p>
     <button @click="scanForFolders" class="scan-manually">Scan</button>
     <div id="folders" class="row working-folders">
       <folder-component
@@ -34,7 +32,7 @@ export default {
   data() {
     return {
       folders: [],
-      pool: null
+      poolIsIdle: false
     };
   },
   components: {
@@ -117,12 +115,16 @@ export default {
   mixins: [CommonMethods],
   updated() {
     this.pool = remote.app.pool;
-    console.log(this.pool);
+    //console.log(this.pool);
   },
   created() {
     this.pool = remote.app.pool;
     this.startWatcher();
-    console.log(this.pool);
+    setInterval(() => {
+      this.poolIsIdle =
+        this.pool.freeWorkers.length === this.pool.workers.length;
+    }, 250);
+    //console.log(this.pool);
   },
   beforeMount() {
     this.pool = remote.app.pool;

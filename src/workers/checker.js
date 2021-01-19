@@ -56,10 +56,12 @@ parentPort.on("message", async job => {
   outputProfile = job.settings.outputProfile;
   pathToProfile = job.settings.pathToProfile;
   //console.log("worker recieved job: ", job);
-  await methods[job.type](job).then(res => {
-    //console.log("worker complete job, sending res to TM:", res);
-    parentPort.postMessage(res);
-  });
+  await methods[job.type](job)
+    .then(res => {
+      //console.log("worker complete job, sending res to TM:", res);
+      parentPort.postMessage(res);
+    })
+    .catch(() => process.exit(1));
 });
 
 async function getProfileDescriptor(file) {
@@ -88,7 +90,7 @@ async function getProfileDescriptor(file) {
 }
 async function convertProfile(file) {
   try {
-    await gm(file)
+    gm(file)
       .profile(pathToProfile)
       .intent("relative")
       .write(file, err => {
