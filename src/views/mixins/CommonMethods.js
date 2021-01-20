@@ -34,11 +34,12 @@ export const CommonMethods = {
       return true;
     },
     async getFiles(dir) {
+      console.log(dir);
       const dirents = await readdir(dir, { withFileTypes: true });
       const files = await Promise.all(
         dirents.map(dirent => {
           const res = pathParse.resolve(dir, dirent.name);
-          return dirent.isDirectory() ? this.getFiles(res) : res;
+          return dirent.isDirectory() ? this.getFiles(res) : res; //!!! Error, recursive promise is not working, let's try iterative approach
         })
       );
       return Array.prototype.concat(...files);

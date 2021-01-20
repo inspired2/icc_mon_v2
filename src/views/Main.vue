@@ -41,7 +41,7 @@ export default {
   computed: {
     ...mapGetters(["settings"]),
     poolRef() {
-      return this.pool;
+      return this.poolIsIdle;
     }
   },
   methods: {

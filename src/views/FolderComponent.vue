@@ -4,7 +4,7 @@
     <p>totalImages: {{ totalImages }}</p>
     <p>checkedImages: {{ checkedImages }}</p>
     <p>convertedImages: {{ convertedImages }}</p>
-    <p>flag: {{ flag }}, isIdlePool: {{ poolIsIdle }}</p>
+    <!-- <p>flag: {{ flag }}, isIdlePool: {{ poolIsIdle }}</p> -->
     <button @click="checkManually(path)" :disabled="!taskFinished">
       Check Manually
     </button>
@@ -42,7 +42,7 @@ export default {
       return this.idleFlag;
     },
     poolIsIdle() {
-      return this.poolRef.isIdle();
+      return this.poolRef;
     },
     taskFinished() {
       const total = this.totalImages;
@@ -106,15 +106,18 @@ export default {
         this.idleFlag = true;
       }, 3000);
     },
-    async checkManually(dir) {
+    checkManually(dir) {
       this.startFileWatcher.watcher.close();
       this.resetCounters();
-      const files = await this.getFiles(dir);
-      files.forEach(file => {
-        if (this.isCheckPending(file)) {
-          this.checkImage(file);
-          this.handleIdleFlag();
-        }
+      this.getFiles(dir).then(files => {
+        files.forEach(file => {
+          if (this.isCheckPending(file)) {
+            const fileName = pathParse.basename(file);
+            this.fileList.push(fileName);
+            this.checkImage(file);
+            this.handleIdleFlag();
+          }
+        });
       });
     }
   },
