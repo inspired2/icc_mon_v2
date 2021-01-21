@@ -1,5 +1,6 @@
-const { readdir } = require("fs").promises;
+//const { readdirSync } = require("fs");
 const pathParse = require("path");
+import { readdirSync } from "fs";
 import config from "../../../config";
 const { ipcRenderer } = require("electron");
 
@@ -34,15 +35,30 @@ export const CommonMethods = {
       return true;
     },
     async getFiles(dir) {
-      console.log(dir);
-      const dirents = await readdir(dir, { withFileTypes: true });
-      const files = await Promise.all(
-        dirents.map(dirent => {
-          const res = pathParse.resolve(dir, dirent.name);
-          return dirent.isDirectory() ? this.getFiles(res) : res; //!!! Error, recursive promise is not working, let's try iterative approach
-        })
-      );
-      return Array.prototype.concat(...files);
+      // console.log(dir);
+      // const dirents = await readdir(dir, { withFileTypes: true });
+      // const files = await Promise.all(
+      //   dirents.map(async dirent => {
+      //     const res = pathParse.resolve(dir, dirent.name);
+      //     return dirent.isDirectory() ? await this.getFiles(res) : res; //!!! Error, recursive promise is not working, let's try iterative approach
+      //   })
+      // );
+      // return Array.prototype.concat(...files);
+      let queue = [dir];
+      let output = [];
+      while (queue.length) {
+        console.log(queue);
+        let dir = queue.shift();
+        let entries = readdirSync(dir, { withFileTypes: true });
+        entries.forEach(entry => {
+          if (entry.isDirectory()) {
+            queue.push(pathParse.resolve(dir, entry.name));
+          } else {
+            output.push(pathParse.resolve(dir, entry.name));
+          }
+        });
+      }
+      return output;
     }
   }
 };
