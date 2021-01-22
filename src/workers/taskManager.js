@@ -4,7 +4,7 @@ import { win, converterWin } from "../background";
 // eslint-disable-next-line no-unused-vars
 const WorkerPool = require("./WorkerPool");
 const os = require("os");
-const cpus = os.cpus().length;
+const cpus = os.cpus().length - 2;
 export const pool = new WorkerPool(cpus);
 ipcMain.on("quit", quitApp);
 ipcMain.on("reloadApp", () => {

@@ -112,8 +112,6 @@ export default {
       this.getFiles(dir).then(files => {
         files.forEach(file => {
           if (this.isCheckPending(file)) {
-            const fileName = pathParse.basename(file);
-            this.fileList.push(fileName);
             this.checkImage(file);
             this.handleIdleFlag();
           }
