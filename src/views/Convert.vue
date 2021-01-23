@@ -231,15 +231,11 @@ export default {
       const index = prop.indexOf(path);
       if (index >= 0) prop.splice(index, 1);
     },
-    async parseSelected(fileList) {
-      console.log(fileList);
-    },
     async testFiles(fileList) {
-      //!!! refactor id hashing
+      //! refactor id hashing
       const id = this.hashPath(fileList[0]);
-      console.log(fileList);
       ipcRenderer.once(`${id}tested`, res => {
-        //add response parsing logic
+        //!add response parsing logic
         console.log("tested", res);
       });
       ipcRenderer.send("getMeta", { id, fileList });

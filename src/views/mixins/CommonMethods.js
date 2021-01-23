@@ -35,19 +35,9 @@ export const CommonMethods = {
       return true;
     },
     async getFiles(dir) {
-      // console.log(dir);
-      // const dirents = await readdir(dir, { withFileTypes: true });
-      // const files = await Promise.all(
-      //   dirents.map(async dirent => {
-      //     const res = pathParse.resolve(dir, dirent.name);
-      //     return dirent.isDirectory() ? await this.getFiles(res) : res; //!!! Error, recursive promise is not working, let's try iterative approach
-      //   })
-      // );
-      // return Array.prototype.concat(...files);
       let queue = [dir];
       let output = [];
       while (queue.length) {
-        console.log(queue);
         let dir = queue.shift();
         let entries = readdirSync(dir, { withFileTypes: true });
         entries.forEach(entry => {

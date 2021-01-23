@@ -115,7 +115,6 @@ export default {
   mixins: [CommonMethods],
   updated() {
     this.pool = remote.app.pool;
-    //console.log(this.pool);
   },
   created() {
     this.pool = remote.app.pool;
@@ -124,11 +123,9 @@ export default {
       this.poolIsIdle =
         this.pool.freeWorkers.length === this.pool.workers.length;
     }, 250);
-    //console.log(this.pool);
   },
   beforeMount() {
     this.pool = remote.app.pool;
-    console.log(this.pool);
   }
 };
 </script>

@@ -4,6 +4,7 @@ const fs = require("fs");
 const gm = require("gm");
 const ExifReader = require("exifreader");
 const sharp = require("sharp");
+const heicConvert = require("heic-convert");
 
 let pathToProfile, outputProfile;
 
@@ -19,12 +20,11 @@ const methods = {
         return Promise.resolve({ id, file, wrongProfile: result });
       });
     } catch (e) {
-      //console.log(e);
+      console.log(e);
       return Promise.resolve({ ...job, result: e });
     }
   },
   async batchConvert(job) {
-    //console.log("starting converter");
     const { image } = job;
     return await sharpConvert(image);
   },
@@ -37,10 +37,18 @@ const methods = {
   }
 };
 async function sharpConvert(imagePath) {
+  let buffer = fs.readFileSync(imagePath);
   const parsedPath = path.parse(imagePath);
   const outputPath = composePath(parsedPath);
+  const fileIsHeic = () => {
+    imagePath.toLowerCase().includes("heic") ||
+      imagePath.toLowerCase().includes("heif");
+  };
+  if (fileIsHeic) {
+    buffer = await heicConvert({ buffer, format: "JPEG", quality: 1 });
+  }
   try {
-    await sharp(imagePath)
+    await sharp(buffer)
       .jpeg({
         quality: 100
       })
@@ -55,10 +63,8 @@ async function sharpConvert(imagePath) {
 parentPort.on("message", async job => {
   outputProfile = job.settings.outputProfile;
   pathToProfile = job.settings.pathToProfile;
-  //console.log("worker recieved job: ", job);
   await methods[job.type](job)
     .then(res => {
-      //console.log("worker complete job, sending res to TM:", res);
       parentPort.postMessage(res);
     })
     .catch(() => process.exit(1));
@@ -102,7 +108,6 @@ async function convertProfile(file) {
   }
 }
 function isConvertPending(profileDesc) {
-  //console.log(profileDesc);
   const regExp = /sRGB\b/;
   if (profileDesc?.icc == outputProfile) return false;
   else if (regExp.test(profileDesc.space) && !profileDesc.icc) return false;

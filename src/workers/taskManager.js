@@ -36,7 +36,6 @@ function batchProcess(job, jobType) {
 
   fileList.forEach(image => {
     const job = { image, type: jobType };
-    //console.log("TM sending job to worker: ", job);
     pool.runTask(job, batchResponder);
   });
 
@@ -47,10 +46,10 @@ function batchProcess(job, jobType) {
       completeJobs.push(res);
     }
     if (completeJobs.length === fileList.length) {
-      //console.log("TM sending back to vue: ", completeJobs);
       converterWin.webContents.send(`${id + jobType}`, completeJobs);
     }
   }
+  //! handle case when not all jobs finished successfully
 }
 
 function responder(err, res) {
